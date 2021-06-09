@@ -1,10 +1,4 @@
 binance:
-  accessKey: ${accessKey:NONE}
+  apiKey: ${apiKey:NONE}
   secretKey: ${secretKey:NONE}
-  markets: ${markets:KRW-BTC,KRW-ETH}
-  candleMinutes: ${candleMinutes:5}
-  longBlueCandleRate: ${longBlueCandleRate:0.004}
-  lossCutRate: ${lossCutRate:0.02}
-  balancePerLevel: ${balancePerLevel:10000.0,20000.0,30000.0,40000.0,50000.0}
-  marginRatePerLevel: ${marginRatePerLevel:0.5,0.4,0.3,0.2,0.1}
-  scaleTradeRatePerLevel: ${scaleTradeRatePerLevel:0.004,0.005,0.006,0.007,0.008}
+  baseEndpoint: https://fapi.binance.com
