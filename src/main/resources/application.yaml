@@ -1,4 +1,5 @@
 binance:
   apiKey: ${apiKey:NONE}
   secretKey: ${secretKey:NONE}
-  baseEndpoint: https://fapi.binance.com
+  symbols: ${symbols:BTCUSDT,ETHUSDT}
+  longBlueCandleRate: ${longBlueCandleRate:0.004}
