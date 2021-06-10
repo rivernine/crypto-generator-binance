@@ -3,10 +3,10 @@ package com.rivernine.cryptoGeneratorBinance.schedule;
 import java.util.List;
 
 import com.rivernine.cryptoGeneratorBinance.common.Status;
-import com.rivernine.cryptoGeneratorBinance.schedule.account.AccountJob;
 import com.rivernine.cryptoGeneratorBinance.schedule.analysis.AnalysisJob;
 import com.rivernine.cryptoGeneratorBinance.schedule.candle.CandleJob;
 import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.user.UserJob;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,14 +26,19 @@ public class ScaleTradeJobScheduler {
   private final Status status;
   private final CandleJob candleJob;
   private final AnalysisJob analysisJob;  
-  private final AccountJob accountJob;
+  private final UserJob accountJob;
+
+  // @Scheduled(fixedDelay = 1000)
+  // public void runCollectCandlesJob() {    
+  //   accountJob.getBalance();
+  //   for(String symbol: symbols) {
+  //     candleJob.collectCandlesFiveMinutes(symbol, 4);
+  //   }
+  // }
 
   @Scheduled(fixedDelay = 1000)
-  public void runCollectCandlesJob() {    
-    accountJob.getAccount();
-    for(String symbol: symbols) {
-      candleJob.collectCandlesFiveMinutes(symbol, 4);
-    }
+  public void runGetBalanceJob() {    
+    log.info(accountJob.getBalance().getBalance().toString());
   }
 
   // @Scheduled(fixedDelay = 1000)

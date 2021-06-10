@@ -1,0 +1,17 @@
+[
+  {
+    "asset":"BNB",
+    "balance":0,
+    "withdrawAvailable":0
+  }, 
+  {
+    "asset":"USDT",
+    "balance":84.44525022,
+    "withdrawAvailable":84.44525022
+  }, 
+  {
+    "asset":"BUSD",
+    "balance":0,
+    "withdrawAvailable":0
+  }
+]
