@@ -1,6 +1,5 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.candle.impl;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;

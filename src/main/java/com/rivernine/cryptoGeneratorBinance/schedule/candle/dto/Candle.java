@@ -1,7 +1,5 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.candle.dto;
 
-import java.math.BigDecimal;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

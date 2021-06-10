@@ -1,6 +1,5 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.analysis.impl;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
