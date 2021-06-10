@@ -50,7 +50,6 @@ public class ScaleTradeJobScheduler {
 
   // @Scheduled(fixedDelay = 1000)
   public void runScaleTradeJob() {
-
     List<Candle> candles;
     Candle candle;
     String symbol = status.getSymbol();
