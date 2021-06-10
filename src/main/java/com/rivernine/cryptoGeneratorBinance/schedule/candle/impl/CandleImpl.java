@@ -28,7 +28,7 @@ public class CandleImpl {
 
   public List<Candle> collectCandlesFiveMinutes(String symbol, Integer limit) {
     List<Candle> result = new ArrayList<>();
-    List<Candlestick> candles = SyncRequestClient.create().getCandlestick(symbol, CandlestickInterval.FIVE_MINUTES, null, null, limit);
+    List<Candlestick> candles = status.getQueryClient().getCandlestick(symbol, CandlestickInterval.FIVE_MINUTES, null, null, limit);
     for( Candlestick candle: candles ) {
       LocalDateTime ldt = Instant.ofEpochMilli(candle.getOpenTime())
                             .atZone(ZoneId.systemDefault()).toLocalDateTime();

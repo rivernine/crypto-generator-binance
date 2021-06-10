@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.rivernine.cryptoGeneratorBinance.client.SyncRequestClient;
 import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +22,19 @@ import lombok.ToString;
 @Getter
 @Setter
 public class Status {
+  
+  @Value("${binance.apiKey}")
+  public String apiKey;
+  @Value("${binance.secretKey}")
+  public String secretKey;
+  public SyncRequestClient queryClient;
+  public SyncRequestClient invokeClient;
+
   @Value("${binance.symbols}")
   public List<String> symbols;
-  
+  @Value("${bianance.leveragePerLevel}")
+  public List<String> leveragePerLevel;
+
   public int step;
   public String symbol;
   public Boolean bidRunning, bidPending;
@@ -40,6 +51,8 @@ public class Status {
   }
 
   public void init(){
+    this.queryClient = SyncRequestClient.create();
+    this.invokeClient = SyncRequestClient.create(this.apiKey, this.secretKey);
     this.step = 0;
     this.symbol = null;
     this.bidRunning = false;
@@ -48,8 +61,7 @@ public class Status {
     this.askPending = false;
 
     this.candles = new HashMap<>();  
-    for(String symbol: symbols) {
+    for(String symbol: symbols) 
       this.candles.put(symbol, new HashMap<>());
-    }
   }
 }

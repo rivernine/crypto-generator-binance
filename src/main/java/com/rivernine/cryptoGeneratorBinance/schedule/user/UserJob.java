@@ -12,12 +12,8 @@ import lombok.RequiredArgsConstructor;
 public class UserJob {
   private final UserImpl userImpl;
 
-  public void getAccount() {
-    userImpl.getAccount();
-  }
-
-  public Balance getBalance() {
-    return userImpl.getBalance();
+  public Balance getUSDTBalance() {
+    return userImpl.getUSDTBalance();
   }
 
 }
