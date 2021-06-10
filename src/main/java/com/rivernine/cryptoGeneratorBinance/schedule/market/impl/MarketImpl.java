@@ -1,4 +1,4 @@
-package com.rivernine.cryptoGeneratorBinance.schedule.candle.impl;
+package com.rivernine.cryptoGeneratorBinance.schedule.market.impl;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.client.SyncRequestClient;
 import com.rivernine.cryptoGeneratorBinance.client.model.enums.CandlestickInterval;
 import com.rivernine.cryptoGeneratorBinance.client.model.market.Candlestick;
+import com.rivernine.cryptoGeneratorBinance.client.model.market.ExchangeInfoEntry;
+import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
-import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
 
 import org.springframework.stereotype.Component;
 
@@ -22,13 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class CandleImpl {
+public class MarketImpl {
 
   private final Status status;
+  private final Client client;
 
   public List<Candle> collectCandlesFiveMinutes(String symbol, Integer limit) {
     List<Candle> result = new ArrayList<>();
-    List<Candlestick> candles = status.getQueryClient().getCandlestick(symbol, CandlestickInterval.FIVE_MINUTES, null, null, limit);
+    List<Candlestick> candles = client.getQueryClient().getCandlestick(symbol, CandlestickInterval.FIVE_MINUTES, null, null, limit);
     for( Candlestick candle: candles ) {
       LocalDateTime ldt = Instant.ofEpochMilli(candle.getOpenTime())
                             .atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -78,6 +81,30 @@ public class CandleImpl {
     }
     
     return result;
+  }
+
+  public void setSymbolsInfo() {
+    List<ExchangeInfoEntry> symbols = client.getQueryClient().getExchangeInformation().getSymbols();
+    for(ExchangeInfoEntry symbol: symbols) {
+      List<List<Map<String, String>>> filters = symbol.getFilters();      
+      String tickSize = null;
+      String stepSize = null;
+      for(List<Map<String, String>> filter: filters) {
+        for(Map<String, String> obj: filter) {
+          if(obj.containsKey("tickSize")) {
+            tickSize = obj.get("tickSize");
+          } else if(obj.containsKey("stepSize")) {
+            stepSize = obj.get("stepSize");
+          }
+        }
+      }
+
+      status.addSymbolsInfo(symbol.getSymbol(), Symbol.builder()
+                                                      .symbol(symbol.getSymbol())
+                                                      .tickSize(tickSize)
+                                                      .stepSize(stepSize)
+                                                      .build());
+    }
   }
 
 }

@@ -1,8 +1,9 @@
-package com.rivernine.cryptoGeneratorBinance.schedule.user.Impl;
+package com.rivernine.cryptoGeneratorBinance.schedule.user.impl;
 
 import java.util.List;
 
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.AccountBalance;
+import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.user.dto.Balance;
 
@@ -15,9 +16,10 @@ import lombok.RequiredArgsConstructor;
 public class UserImpl {
 
   private final Status status;
+  private final Client client;
 
   public Balance getUSDTBalance() {
-    List<AccountBalance> balances = status.getInvokeClient().getBalance();
+    List<AccountBalance> balances = client.getInvokeClient().getBalance();
     Balance result = new Balance();
     for(AccountBalance balance: balances) {
       if(balance.getAsset().equals("USDT")) {

@@ -3,4 +3,5 @@ binance:
   secretKey: ${secretKey:NONE}
   symbols: ${symbols:BTCUSDT,ETHUSDT}
   longBlueCandleRate: ${longBlueCandleRate:0.004}
-  leveragePerLevel: ${leveragePerLevel:1,2,3,4,5}
+  leverages: ${leverages:1,2,3,4,5}
+  bidBalance: ${bidBalance:5}

@@ -1,7 +1,7 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.user;
 
-import com.rivernine.cryptoGeneratorBinance.schedule.user.Impl.UserImpl;
 import com.rivernine.cryptoGeneratorBinance.schedule.user.dto.Balance;
+import com.rivernine.cryptoGeneratorBinance.schedule.user.impl.UserImpl;
 
 import org.springframework.stereotype.Component;
 

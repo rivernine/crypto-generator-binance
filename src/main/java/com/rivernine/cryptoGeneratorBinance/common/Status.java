@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.client.SyncRequestClient;
-import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,24 +23,22 @@ import lombok.ToString;
 @Setter
 public class Status {
   
-  @Value("${binance.apiKey}")
-  public String apiKey;
-  @Value("${binance.secretKey}")
-  public String secretKey;
-  public SyncRequestClient queryClient;
-  public SyncRequestClient invokeClient;
-
   @Value("${binance.symbols}")
   public List<String> symbols;
-  @Value("${bianance.leveragePerLevel}")
-  public List<String> leveragePerLevel;
 
-  public int step;
+  public Integer level = 0;
+  public Integer step;
+  
   public String symbol;
   public Boolean bidRunning, bidPending;
   public Boolean askRunning, askPending;
 
   public Map<String, Map<LocalDateTime, Candle>> candles;
+  public Map<String, Symbol> symbolsInfo;
+
+  public void increaseLevel() {
+    this.level++;
+  }
 
   public void addCandles(String symbol, LocalDateTime key, Candle candleDto) {
     if(!this.candles.get(symbol).containsKey(key)) {
@@ -50,9 +48,12 @@ public class Status {
     }
   }
 
+  public void addSymbolsInfo(String symbol, Symbol info) {
+    this.symbolsInfo.put(symbol, info);
+  }
+
   public void init(){
-    this.queryClient = SyncRequestClient.create();
-    this.invokeClient = SyncRequestClient.create(this.apiKey, this.secretKey);
+    this.level = 0;
     this.step = 0;
     this.symbol = null;
     this.bidRunning = false;
@@ -61,6 +62,7 @@ public class Status {
     this.askPending = false;
 
     this.candles = new HashMap<>();  
+    this.symbolsInfo = new HashMap<>();
     for(String symbol: symbols) 
       this.candles.put(symbol, new HashMap<>());
   }

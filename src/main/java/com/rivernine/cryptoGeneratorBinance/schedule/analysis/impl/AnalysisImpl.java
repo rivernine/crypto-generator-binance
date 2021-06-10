@@ -2,7 +2,7 @@ package com.rivernine.cryptoGeneratorBinance.schedule.analysis.impl;
 
 import java.util.List;
 
-import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

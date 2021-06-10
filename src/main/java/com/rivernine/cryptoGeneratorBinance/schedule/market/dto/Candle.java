@@ -1,4 +1,4 @@
-package com.rivernine.cryptoGeneratorBinance.schedule.candle.dto;
+package com.rivernine.cryptoGeneratorBinance.schedule.market.dto;
 
 import lombok.Builder;
 import lombok.Getter;

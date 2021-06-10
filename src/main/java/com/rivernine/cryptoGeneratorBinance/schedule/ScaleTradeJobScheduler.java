@@ -2,13 +2,15 @@ package com.rivernine.cryptoGeneratorBinance.schedule;
 
 import java.util.List;
 
+import com.rivernine.cryptoGeneratorBinance.common.Client;
+import com.rivernine.cryptoGeneratorBinance.common.Config;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.analysis.AnalysisJob;
-import com.rivernine.cryptoGeneratorBinance.schedule.candle.CandleJob;
-import com.rivernine.cryptoGeneratorBinance.schedule.candle.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.MarketJob;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.trade.TradeJob;
 import com.rivernine.cryptoGeneratorBinance.schedule.user.UserJob;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,32 +22,46 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ScaleTradeJobScheduler {
 
-  @Value("${binance.symbols}")
-  private List<String> symbols;
-
   private final Status status;
-  private final CandleJob candleJob;
+  private final Client client;
+  private final Config config;
+  
+  private final MarketJob marketJob;
   private final AnalysisJob analysisJob;  
   private final UserJob userJob;
+  private final TradeJob tradeJob;
 
-  @Scheduled(fixedDelay = 1000)
+  @Scheduled(fixedDelay = 1000000)
+  public void runTestJob() {
+    status.init();
+    client.init();
+    marketJob.setSymbolsInfo();
+
+    log.info(status.getSymbolsInfo().toString());
+  }
+
+  // @Scheduled(fixedDelay = 1000)
   public void runCollectCandlesJob() {    
+    List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
-      candleJob.collectCandlesFiveMinutes(symbol, 4);
+      marketJob.collectCandlesFiveMinutes(symbol, 4);
     }
   }
 
-  @Scheduled(fixedDelay = 1000)
+  // @Scheduled(fixedDelay = 1000)
   public void runScaleTradeJob() {
 
     List<Candle> candles;
+    Candle candle;
     String symbol = status.getSymbol();
+    Integer level = status.getLevel();
 
     switch(status.getStep()) {
       case 0:  
         // [ init step ]
         log.info("[0 -> 1] [select market step] ");
         status.init();
+        client.init();
         status.setStep(1);
         break;
       case 1:
@@ -71,9 +87,15 @@ public class ScaleTradeJobScheduler {
         break;
       case 10:
         // [bid step]
+        candle = marketJob.getLastCandle(symbol);
         Double myBalance = userJob.getUSDTBalance().getBalance();
-        if(myBalance.compareTo(0.0) == 1) {
+        Double bidBalance = config.getBidBalance() * config.getLeveragePerLevel(level).doubleValue();
+
+        if(myBalance.compareTo(bidBalance) != -1) {
           log.info("Let's bid~");
+          Double close = candle.getClose();
+          Double bidVolume = bidBalance / close;
+
         } else {
           log.info("Not enough money.");
         }
