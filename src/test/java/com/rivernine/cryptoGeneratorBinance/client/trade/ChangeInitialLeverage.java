@@ -10,6 +10,6 @@ public class ChangeInitialLeverage {
         RequestOptions options = new RequestOptions();
         SyncRequestClient syncRequestClient = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY,
                 options);
-        System.out.println(syncRequestClient.changeInitialLeverage("BTCUSDT", 1));
+        System.out.println(syncRequestClient.changeInitialLeverage("XRPUSDT", 1));
     }
 }

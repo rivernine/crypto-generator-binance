@@ -12,7 +12,7 @@ public class TradeJob {
   private final TradeImpl tradeImpl;
 
   public void sample() {
-    tradeImpl.sample();
+    tradeImpl.bid();
   }
 
 }

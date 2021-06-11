@@ -26,7 +26,7 @@ public class Status {
   @Value("${binance.symbols}")
   public List<String> symbols;
 
-  public Integer level = 0;
+  public Integer level = 1;
   public Integer step;
   
   public String symbol;
@@ -53,7 +53,7 @@ public class Status {
   }
 
   public void init(){
-    this.level = 0;
+    this.level = 1;
     this.step = 0;
     this.symbol = null;
     this.bidRunning = false;

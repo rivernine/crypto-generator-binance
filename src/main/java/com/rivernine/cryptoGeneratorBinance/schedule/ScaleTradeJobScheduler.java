@@ -93,7 +93,7 @@ public class ScaleTradeJobScheduler {
         if(myBalance.compareTo(bidBalance) != -1) {
           log.info("Let's bid~");
           Double close = candle.getClose();
-          Double bidVolume = bidBalance / close;
+          Double volume = bidBalance / close;
 
         } else {
           log.info("Not enough money.");

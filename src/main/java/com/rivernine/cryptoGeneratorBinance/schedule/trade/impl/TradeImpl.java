@@ -24,11 +24,12 @@ public class TradeImpl {
   private final Status status;
   private final Client client;
 
-  public void sample() {
+  public void bid(String symbol, String quantity, String price) {
     // bid
     client.getInvokeClient().postOrder("XRPUSDT", OrderSide.BUY, PositionSide.LONG, OrderType.LIMIT,
                                         TimeInForce.FOK, "6", "1000.0", null,
                                         null, "1010.0", null, NewOrderRespType.RESULT);
+    // client.getInvokeClient().
   }
 
 }
