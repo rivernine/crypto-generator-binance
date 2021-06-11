@@ -1,11 +1,13 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.trade.impl;
 
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
 
-import com.rivernine.cryptoGeneratorBinance.client.SyncRequestClient;
-import com.rivernine.cryptoGeneratorBinance.client.model.market.ExchangeInfoEntry;
-import com.rivernine.cryptoGeneratorBinance.client.model.market.ExchangeInformation;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.NewOrderRespType;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.OrderSide;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.OrderType;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.PositionSide;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.TimeInForce;
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.WorkingType;
 import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 
@@ -23,7 +25,10 @@ public class TradeImpl {
   private final Client client;
 
   public void sample() {
-    
+    // bid
+    client.getInvokeClient().postOrder("XRPUSDT", OrderSide.BUY, PositionSide.LONG, OrderType.LIMIT,
+                                        TimeInForce.FOK, "6", "1000.0", null,
+                                        null, "1010.0", null, NewOrderRespType.RESULT);
   }
 
 }
