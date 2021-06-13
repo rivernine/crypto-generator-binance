@@ -39,7 +39,7 @@ public class Status {
   public String bidOrderTime;
   public Boolean waitBidOrder;
 
-  public Boolean start;
+  public Boolean isStart;
   public Double usedBalance;
 
   public Map<Integer, Order> askInfoPerLevel;
@@ -47,6 +47,10 @@ public class Status {
 
   public void increaseLevel() {
     this.level++;
+  }
+
+  public void decreaseLevel() {
+    this.level--;
   }
 
   public void addCandles(String symbol, LocalDateTime key, Candle candleDto) {
@@ -98,7 +102,7 @@ public class Status {
     this.bidOrderTime = null;
     this.waitBidOrder = false;
 
-    this.start = false;
+    this.isStart = false;
     this.usedBalance = 0.0;
 
     this.askInfoPerLevel = new HashMap<>();

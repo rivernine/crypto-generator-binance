@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
+import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
+import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,8 +21,14 @@ public class AnalysisImpl {
 
   @Value("${binance.longBlueCandleRate}")
   private Double longBlueCandleRate;
+  @Value("${binance.lossCutRate}")
+  private Double lossCutRate;
   @Value("${binance.marginRatePerLevel}")	
   private List<Double> marginRatePerLevel;
+  @Value("${binance.scaleTradeRatePerLevel}")	
+  private List<Double> scaleTradeRatePerLevel;
+
+  private final Status status;
 
   public Boolean analysisCandles(List<Candle> candles, Integer count) {
     Boolean result = false;
@@ -61,31 +69,82 @@ public class AnalysisImpl {
     return result;
   }
 
-  public String calAskPrice(Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
+  public String calAskPrice(Symbol symbol, Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
     Double feeRate = 0.0002;
     Double marginRate = marginRatePerLevel.get(level);
+    Double coinQuantity = Double.parseDouble(getCoinQuantity(bidOrders, level));
+    Double targetBalance = usedBalance * (1 + marginRate + feeRate);
+    Double targetPrice = targetBalance / coinQuantity;
 
+    targetPrice = convertTickPrice(symbol, targetPrice);
+    log.info("coinQuantity : targetBalance");
+    log.info(coinQuantity.toString() + " : " + targetBalance.toString());
+
+    return targetPrice.toString();
+  }
+
+  public Double calLossCutPrice(Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
+    Double coinQuantity = Double.parseDouble(getCoinQuantity(bidOrders, level));
+    Double avgBuyPrice = usedBalance / coinQuantity;
+    Double lossCutPrice = avgBuyPrice * (1 - lossCutRate);
+
+    return lossCutPrice;
+  }
+
+  public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {
     Double coinQuantity = 0.0;
     for(int i = 1; i <= level; i++) {
       coinQuantity += bidOrders.get(i).getOrigQty().doubleValue();
     }
 
-    Double targetBalance = usedBalance * (1 + marginRate + feeRate);
-    Double targetPrice = targetBalance / coinQuantity;
-    targetPrice = change
+    return coinQuantity.toString();
+  }
 
-    Double targetBalance = Double.parseDouble(totalUsedBalance) * (1 + marginRate + feeRate);
-    String targetPrice = Double.toString(targetBalance / Double.parseDouble(coinBalance));
-    String targetPriceAbleOrder = changeAbleOrderPrice(targetPrice);
+  public Boolean judgeScaleTrade(Double curPrice, Double lastBidPrice, Integer level) {
+    Boolean result;
+    Double scaleTradeRate = scaleTradeRatePerLevel.get(level);
+    Double thresholdPrice = lastBidPrice * (1 - scaleTradeRate);
+    
+    if(curPrice.compareTo(thresholdPrice) == -1) {
+      result = true;
+    } else {
+      result = false;
+    }
+    log.info("curPrice : thresholdPrice");
+    log.info(curPrice.toString() + " : " + thresholdPrice.toString());
 
-    log.info("level : marginRate");
-    log.info(Integer.toString(scaleTradeStatusProperties.getLevel()) + " : " + Double.toString(marginRate));
-    log.info("usedBalance : usedFee : totalUsedBalance");
-    log.info(usedBalance + " : " + usedFee + " : " + totalUsedBalance);
-    log.info("coinBalance : targetPrice : targetPriceAbleOrder");
-    log.info(coinBalance + " : " + targetPrice + " : " + targetPriceAbleOrder);
+    return result;
+  }
 
-    return targetPriceAbleOrder;
+  public Double convertTickPrice(Symbol symbol, Double price) {
+    Double result;
+    Double tickSize = Double.parseDouble(symbol.getTickSize());
+    Double mod = price % tickSize;
 
+    if(mod.compareTo(0.0) == 0) {
+      result = price;
+    } else {
+      Double tmp = price / tickSize;
+      result = tmp.intValue() * tickSize + tickSize;
+    }
+    log.info("price : convertedPrice");
+    log.info(price.toString() + " : " + result.toString());
+
+    return result;
+  }
+
+  public String convertStepSize(Symbol symbol, Double quantity) {
+    Double result;
+    Double stepSize = Double.parseDouble(symbol.getStepSize());
+    Double mod = quantity / stepSize;
+
+    if(mod.compareTo(0.0) == 0) {
+      result = quantity;
+    } else {
+      Double tmp = quantity / stepSize;
+      result = tmp.intValue() * stepSize;
+    }
+
+    return result.toString();
   }
 }

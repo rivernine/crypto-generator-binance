@@ -27,14 +27,30 @@ public class TradeImpl {
     return client.getInvokeClient().changeInitialLeverage(symbol, leverage);
   }
 
+  public Order getOrder(String symbol, Long orderId) {
+    return client.getInvokeClient().getOrder(symbol, orderId, null);
+  }
+
   public Order bid(String symbol, String quantity, String price) {
     return client.getInvokeClient().postOrder(symbol, OrderSide.BUY, PositionSide.BOTH, OrderType.LIMIT,
                                       TimeInForce.GTC, quantity, price, null,
                                       null, null, null, NewOrderRespType.RESULT);
   }
 
-  public Order getOrder(String symbol, Long orderId) {
-    return client.getInvokeClient().getOrder(symbol, orderId, null);
+  public Order ask(String symbol, String quantity, String price) {
+    return client.getInvokeClient().postOrder(symbol, OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
+                                      TimeInForce.GTC, quantity, price, "true", 
+                                      null,	null, null, NewOrderRespType.RESULT);
+  }
+
+  public Order askMarket(String symbol, String quantity) {
+    return client.getInvokeClient().postOrder(symbol, OrderSide.SELL, PositionSide.BOTH, OrderType.MARKET, 
+                                      TimeInForce.GTC, quantity, null, "true", 
+                                      null,	null, null, NewOrderRespType.RESULT);
+  }
+
+  public Order cancelOrder(String symbol, Long orderId) {
+    return client.getInvokeClient().cancelOrder(symbol, orderId, null);
   }
 
 }

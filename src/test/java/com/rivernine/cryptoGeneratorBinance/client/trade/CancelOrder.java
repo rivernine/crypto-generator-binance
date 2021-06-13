@@ -10,6 +10,6 @@ public class CancelOrder {
         RequestOptions options = new RequestOptions();
         SyncRequestClient syncRequestClient = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY,
                 options);
-        System.out.println(syncRequestClient.cancelOrder("BTCUSDT", 37886301L, null));
+        System.out.println(syncRequestClient.cancelOrder("ETHUSDT", 8389765500032108013L, null));
     }
 }
