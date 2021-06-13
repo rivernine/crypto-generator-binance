@@ -1,7 +1,9 @@
 package com.rivernine.cryptoGeneratorBinance.schedule;
 
 import java.util.List;
+import java.util.Map;
 
+import com.rivernine.cryptoGeneratorBinance.client.model.enums.OrderState;
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
 import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Config;
@@ -114,21 +116,20 @@ public class ScaleTradeJobScheduler {
         break;
       case 20:
         // [ ask step ]
+        Map<Integer, Order> bidOrders = status.getBidInfoPerLevel();
+        
+        calAskPrice(bidOrders, level, usedBalance);
+
         orderChanceDtoForAsk = ordersJobConfiguration.getOrdersChanceForAskJob(market);
-        log.info("orderChanceDtoForAsk: " + orderChanceDtoForAsk.toString());
-        if(Double.parseDouble(orderChanceDtoForAsk.getBalance()) * Double.parseDouble(orderChanceDtoForAsk.getAvgBuyPrice()) > 5000.0){
-          askPrice = analysisForScaleTradingJobConfiguration.getAskPriceJob(orderChanceDtoForAsk);
-          ordersAskResponseDto = ordersJobConfiguration.askJob(market, orderChanceDtoForAsk.getBalance(), askPrice);
-          if(ordersAskResponseDto.getSuccess()) {
-            log.info("[changeStatus: 20 -> 30] [wait step] ");
-            scaleTradeStatusProperties.addAskInfoPerLevel(ordersAskResponseDto);
-            scaleTradeStatusProperties.setWaitingAskOrder(true);
-            statusProperties.setCurrentStatus(30);
-          } else {
-            log.info("Error during asking");
-          }
+        askPrice = analysisForScaleTradingJobConfiguration.getAskPriceJob(orderChanceDtoForAsk);
+        ordersAskResponseDto = ordersJobConfiguration.askJob(market, orderChanceDtoForAsk.getBalance(), askPrice);
+        if(ordersAskResponseDto.getSuccess()) {
+          log.info("[changeStatus: 20 -> 30] [wait step] ");
+          scaleTradeStatusProperties.addAskInfoPerLevel(ordersAskResponseDto);
+          scaleTradeStatusProperties.setWaitingAskOrder(true);
+          statusProperties.setCurrentStatus(30);
         } else {
-          log.info("Not enough coin balance");
+          log.info("Error during asking");
         }
         break;
       case 30:
@@ -145,9 +146,10 @@ public class ScaleTradeJobScheduler {
 
           Order bidOrder = status.getBidInfoPerLevel().get(level);
           Order newOrder = tradeJob.getOrder(selectedSymbol.getSymbol(), bidOrder.getOrderId());
-          if(newOrder.getStatus().equals("CANCELED")) {
+          if(newOrder.getStatus().equals(OrderState.FILLED)) {
             log.info("Success bidding!!");              
             status.setStart(true);
+            status.addBidInfoPerLevel(newOrder);
             status.updateUsedBalance(newOrder);
             status.setWaitBidOrder(false);
             if(status.getWaitAskOrder()) {

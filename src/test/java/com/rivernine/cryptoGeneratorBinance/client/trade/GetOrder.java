@@ -10,6 +10,6 @@ public class GetOrder {
         RequestOptions options = new RequestOptions();
         SyncRequestClient syncRequestClient = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY,
                 options);
-        System.out.println(syncRequestClient.getOrder("XRPUSDT", 14953268487L, null));
+        System.out.println(syncRequestClient.getOrder("ETHUSDT", 8389765499996250234L, null));
     }
 }

@@ -5,3 +5,4 @@ binance:
   longBlueCandleRate: ${longBlueCandleRate:0.004}
   leverages: ${leverages:1,2,3,4,5}
   bidBalance: ${bidBalance:5}
+  marginRatePerLevel: ${marginRatePerLevel:0.5,0.4,0.3,0.2,0.1}

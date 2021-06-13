@@ -10,6 +10,6 @@ public class GetAccountTrades {
         RequestOptions options = new RequestOptions();
         SyncRequestClient syncRequestClient = SyncRequestClient.create(PrivateConfig.API_KEY, PrivateConfig.SECRET_KEY,
                 options);
-        System.out.println(syncRequestClient.getAccountTrades("BTCUSDT", null, null, null, null));
+        System.out.println(syncRequestClient.getAccountTrades("ETHUSDT", null, null, null, null));
     }
 }

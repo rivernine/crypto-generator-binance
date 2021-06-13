@@ -16,13 +16,13 @@ public class PostOrder {
 
 			// place dual position side order.
 			// Switch between dual or both position side, call: com.rivernine.cryptoGeneratorBinance.client.trade.ChangePositionSide
-			// System.out.println(syncRequestClient.postOrder("XRPUSDT", OrderSide.BUY, PositionSide.BOTH, OrderType.LIMIT, 
-			// 				TimeInForce.GTC, "6", "0.860", null, 
-			// 				null, null, null, NewOrderRespType.RESULT));
+			System.out.println(syncRequestClient.postOrder("ETHUSDT", OrderSide.BUY, PositionSide.BOTH, OrderType.LIMIT, 
+							TimeInForce.GTC, "0.003", "2403", null, 
+							null, null, null, NewOrderRespType.RESULT));
 
-			System.out.println(syncRequestClient.postOrder("XRPUSDT", OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
-							TimeInForce.GTC, "6", "0.8605", "true", 
-							null,	null, null, NewOrderRespType.RESULT));
+			// System.out.println(syncRequestClient.postOrder("XRPUSDT", OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
+			// 				TimeInForce.GTC, "6", "0.8605", "true", 
+			// 				null,	null, null, NewOrderRespType.RESULT));
 
 	// postOrder(symbol, side, positionSide, orderType,
 	//          timeInForce, quantity, price, reduceOnly,
