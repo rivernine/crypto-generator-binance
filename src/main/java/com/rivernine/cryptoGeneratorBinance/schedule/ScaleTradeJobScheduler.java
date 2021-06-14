@@ -1,5 +1,6 @@
 package com.rivernine.cryptoGeneratorBinance.schedule;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,16 +36,7 @@ public class ScaleTradeJobScheduler {
   private final UserJob userJob;
   private final TradeJob tradeJob;
 
-  @Scheduled(fixedDelay = 1000000)
-  public void runTestJob() {
-    status.init();
-    client.init();
-    marketJob.setSymbolsInfo();
-
-    log.info(status.getSymbolsInfo().toString());
-  }
-
-  // @Scheduled(fixedDelay = 1000)
+  @Scheduled(fixedDelay = 1000)
   public void runCollectCandlesJob() {    
     List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
@@ -54,10 +46,16 @@ public class ScaleTradeJobScheduler {
 
   // @Scheduled(fixedDelay = 1000)
   public void runScaleTradeJob() {
+    Integer level = status.getLevel();
     List<Candle> candles;
     Candle candle;
-    Symbol selectedSymbol = status.getSymbol();
-    Integer level = status.getLevel();
+    Map<Integer, Order> bidOrders = status.getBidInfoPerLevel();
+    Map<Integer, Order> askOrders = status.getAskInfoPerLevel();
+    Order bidOrder, askOrder;
+    Symbol symbol = status.getSymbol();
+    String symbolName = symbol.getSymbolName();
+    String coinQuantity;
+    Double usedBalance;
 
     switch(status.getStep()) {
       case 0:  
@@ -92,15 +90,16 @@ public class ScaleTradeJobScheduler {
         break;
       case 10:
         // [bid step]
-        candle = marketJob.getLastCandle(selectedSymbol.getSymbol());
+        candle = marketJob.getLastCandle(symbolName);
+        Integer leverage = config.getLeveragePerLevel(level);
         Double myBalance = userJob.getUSDTBalance().getBalance();
-        Double bidBalance = config.getBidBalance() * config.getLeveragePerLevel(level).doubleValue();
+        Double bidBalance = config.getBidBalance() * leverage.doubleValue();
 
         if(myBalance.compareTo(bidBalance) != -1) {
           Double closePrice = candle.getClose();
-          String quantity = analysisJob.convertStepSize(selectedSymbol, bidBalance / closePrice);
-          tradeJob.changeInitialLeverage(selectedSymbol.getSymbol(), config.getLeveragePerLevel(level));
-          Order bidOrder = tradeJob.bid(selectedSymbol.getSymbol(), quantity, closePrice.toString());
+          String quantity = analysisJob.convertStepSize(symbol, bidBalance / closePrice);
+          tradeJob.changeInitialLeverage(symbolName, leverage);
+          bidOrder = tradeJob.bid(symbolName, quantity, closePrice.toString());
           if(bidOrder.getStatus().equals("NEW")) {
             log.info("[10 -> 30] [wait step]");
             status.addBidInfoPerLevel(bidOrder);
@@ -117,10 +116,10 @@ public class ScaleTradeJobScheduler {
         break;
       case 20:
         // [ ask step ]
-        Map<Integer, Order> bidOrders = status.getBidInfoPerLevel();
-        String askPrice = analysisJob.calAskPrice(selectedSymbol, bidOrders, level, status.getUsedBalance());
-        String askQuantity = analysisJob.getCoinQuantity(bidOrders, level);
-        Order askOrder = tradeJob.ask(selectedSymbol.getSymbol(), askQuantity, askPrice);
+        coinQuantity = userJob.getCoinQuantity(bidOrders, level);
+        usedBalance = status.getUsedBalance();
+        String askPrice = analysisJob.calAskPrice(level, symbol, coinQuantity, usedBalance);
+        askOrder = tradeJob.ask(symbolName, coinQuantity, askPrice);
         if(askOrder.getStatus().equals("NEW")) {
           log.info("[20 -> 30] [wait step]");
           status.addAskInfoPerLevel(askOrder);
@@ -131,8 +130,9 @@ public class ScaleTradeJobScheduler {
         }
         break;
       case 30:
-        candle = marketJob.getLastCandle(selectedSymbol.getSymbol());
+        candle = marketJob.getLastCandle(symbolName);
         String lastbidOrderTime = status.getBidOrderTime();
+        
         if(status.getWaitBidOrder()) {
           if(!lastbidOrderTime.equals(candle.getTime())) {
             if(!status.getIsStart()) 
@@ -142,8 +142,8 @@ public class ScaleTradeJobScheduler {
             break;
           }
 
-          Order oldBidOrder = status.getBidInfoPerLevel().get(level);
-          Order newBidOrder = tradeJob.getOrder(selectedSymbol.getSymbol(), oldBidOrder.getOrderId());
+          Order oldBidOrder = bidOrders.get(level);
+          Order newBidOrder = tradeJob.getOrder(symbolName, oldBidOrder.getOrderId());
           if(newBidOrder.getStatus().equals(OrderState.FILLED)) {
             log.info("Success bidding!!");              
             status.setIsStart(true);
@@ -164,8 +164,10 @@ public class ScaleTradeJobScheduler {
 
         if(status.getWaitAskOrder()) {
           Order oldAskOrder = status.getAskInfoPerLevel().get(level);
-          Order newAskOrder = tradeJob.getOrder(selectedSymbol.getSymbol(), oldAskOrder.getOrderId());
-          Double lossCutPrice = analysisJob.calLossCutPrice(status.getBidInfoPerLevel(), level, status.getUsedBalance());
+          Order newAskOrder = tradeJob.getOrder(symbolName, oldAskOrder.getOrderId());
+          coinQuantity = userJob.getCoinQuantity(bidOrders, level);
+          usedBalance = status.getUsedBalance();
+          Double lossCutPrice = analysisJob.calLossCutPrice(coinQuantity, usedBalance);
 
           if( level == 5 && 
               !lastbidOrderTime.equals(candle.getTime()) &&
@@ -181,8 +183,8 @@ public class ScaleTradeJobScheduler {
           } else {
             if(newAskOrder.getStatus().equals(OrderState.FILLED)) {
               log.info("Success asking!!");
-              log.info("[30 -> -1] [init step] ");
-              status.setStep(-1);
+              log.info("[30 -> 0] [init step] ");
+              status.setStep(0);
             } else {
               log.info("Wait for ask");
             }
@@ -192,13 +194,13 @@ public class ScaleTradeJobScheduler {
 
       case 40:
         // [ cancel bid order ]
-        Order cancelBidOrder = tradeJob.cancelOrder(selectedSymbol.getSymbol(), status.getBidInfoPerLevel().get(level).getOrderId());
+        Order cancelBidOrder = tradeJob.cancelOrder(symbolName, bidOrders.get(level).getOrderId());
         if(cancelBidOrder.getStatus().equals(OrderState.CANCELED)) {
           log.info("Success cancel bid order!!");
           status.setWaitBidOrder(false);
           if(!status.getIsStart()) {
-            log.info("[40 -> -1] [init step]");
-            status.setStep(-1);
+            log.info("[40 -> 0] [init step]");
+            status.setStep(0);
           } else {
             log.info("Cannot bid whild scale Trading. Roll back level!!");
             log.info("[40 -> 20] [ask step]");
@@ -211,7 +213,7 @@ public class ScaleTradeJobScheduler {
         break;      
       case 41:
         // [ cancel ask order for bid step ]
-        Order cancelAskOrder = tradeJob.cancelOrder(selectedSymbol.getSymbol(), status.getAskInfoPerLevel().get(level).getOrderId());
+        Order cancelAskOrder = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
         if(cancelAskOrder.getStatus().equals(OrderState.CANCELED)) {
           log.info("Success cancel ask order for bid!!");
           log.info("[41 -> 20] [ask step]");
@@ -223,7 +225,7 @@ public class ScaleTradeJobScheduler {
         break;  
       case 42:
         // [ cancel ask order for scale trade step ]
-        Order cancelAskOrderForScaleTrade = tradeJob.cancelOrder(selectedSymbol.getSymbol(), status.getAskInfoPerLevel().get(level).getOrderId());
+        Order cancelAskOrderForScaleTrade = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
         if(cancelAskOrderForScaleTrade.getStatus().equals(OrderState.CANCELED)) {
           log.info("Success cancel ask order for scale trade!!. Increase Level!!");
           log.info("[42 -> 10] [bid step]");
@@ -236,24 +238,24 @@ public class ScaleTradeJobScheduler {
         break; 
       case 999:   
         // [ loss cut step ]
-        Order cancelOrderForLossCut = tradeJob.cancelOrder(selectedSymbol.getSymbol(), status.getAskInfoPerLevel().get(level).getOrderId());
+        Order cancelOrderForLossCut = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
         if(cancelOrderForLossCut.getStatus().equals(OrderState.CANCELED)) {
           log.info("Success cancel order!!");
           status.setWaitAskOrder(false);
           String quantity = analysisJob.getCoinQuantity(status.getBidInfoPerLevel(), level);
-          Order newOrder = tradeJob.askMarket(selectedSymbol.getSymbol(), quantity);
+          Order newOrder = tradeJob.askMarket(symbolName, quantity);
           if(newOrder.getStatus().equals(OrderState.FILLED)) {
             log.info("Success loss cut..");
-            log.info("[999 -> -1] [init step] ");
-            status.setStep(-1);
+            log.info("[999 -> 0] [init step] ");
+            status.setStep(0);
           } else {
             log.info("Error during asking");
 
           }
         } else {
           log.info("Already success ask order!!");
-          log.info("[999 -> -1] [init step] ");
-          status.setStep(-1);
+          log.info("[999 -> 0] [init step] ");
+          status.setStep(0);
         }
         break; 
     }

@@ -9,13 +9,13 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class Symbol {
-  private String symbol;
+  private String symbolName;
   private String tickSize;  // price
   private String stepSize;  // quantity
 
   @Builder
-  public Symbol(String symbol, String tickSize, String stepSize){
-    this.symbol = symbol;
+  public Symbol(String symbolName, String tickSize, String stepSize){
+    this.symbolName = symbolName;
     this.tickSize = tickSize;
     this.stepSize = stepSize;
   }

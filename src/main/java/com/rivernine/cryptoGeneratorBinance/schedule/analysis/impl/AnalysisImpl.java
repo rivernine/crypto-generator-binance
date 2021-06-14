@@ -69,23 +69,21 @@ public class AnalysisImpl {
     return result;
   }
 
-  public String calAskPrice(Symbol symbol, Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
+  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, Double usedBalance) {
     Double feeRate = 0.0002;
     Double marginRate = marginRatePerLevel.get(level);
-    Double coinQuantity = Double.parseDouble(getCoinQuantity(bidOrders, level));
     Double targetBalance = usedBalance * (1 + marginRate + feeRate);
-    Double targetPrice = targetBalance / coinQuantity;
+    Double targetPrice = targetBalance / Double.parseDouble(coinQuantity);
 
     targetPrice = convertTickPrice(symbol, targetPrice);
     log.info("coinQuantity : targetBalance");
-    log.info(coinQuantity.toString() + " : " + targetBalance.toString());
+    log.info(coinQuantity + " : " + targetBalance.toString());
 
     return targetPrice.toString();
   }
 
-  public Double calLossCutPrice(Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
-    Double coinQuantity = Double.parseDouble(getCoinQuantity(bidOrders, level));
-    Double avgBuyPrice = usedBalance / coinQuantity;
+  public Double calLossCutPrice(String coinQuantity, Double usedBalance) {
+    Double avgBuyPrice = usedBalance / Double.parseDouble(coinQuantity);
     Double lossCutPrice = avgBuyPrice * (1 - lossCutRate);
 
     return lossCutPrice;

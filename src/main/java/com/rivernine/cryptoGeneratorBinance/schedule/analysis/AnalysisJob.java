@@ -22,12 +22,12 @@ public class AnalysisJob {
     return analysisImpl.analysisCandles(candles, count);
   }
 
-  public String calAskPrice(Symbol symbol, Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
-    return analysisImpl.calAskPrice(symbol, bidOrders, level, usedBalance);
+  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, Double usedBalance) {
+    return analysisImpl.calAskPrice(level, symbol, coinQuantity, usedBalance);
   }
 
-  public Double calLossCutPrice(Map<Integer, Order> bidOrders, Integer level, Double usedBalance) {
-    return analysisImpl.calLossCutPrice(bidOrders, level, usedBalance);
+  public Double calLossCutPrice(String coinQuantity, Double usedBalance) {
+    return analysisImpl.calLossCutPrice(coinQuantity, usedBalance);
   }
 
   public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {

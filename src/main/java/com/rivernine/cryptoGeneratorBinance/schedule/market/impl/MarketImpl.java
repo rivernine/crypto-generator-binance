@@ -100,7 +100,7 @@ public class MarketImpl {
       }
 
       status.addSymbolsInfo(symbol.getSymbol(), Symbol.builder()
-                                                      .symbol(symbol.getSymbol())
+                                                      .symbolName(symbol.getSymbol())
                                                       .tickSize(tickSize)
                                                       .stepSize(stepSize)
                                                       .build());
