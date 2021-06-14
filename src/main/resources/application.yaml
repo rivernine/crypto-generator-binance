@@ -6,5 +6,5 @@ binance:
   bidBalance: ${bidBalance:6}
   longBlueCandleRate: ${longBlueCandleRate:0.002}
   lossCutRate: ${lossCutRate:0.02}
-  marginRatePerLevel: ${marginRatePerLevel:0.5,0.4,0.3,0.2,0.1}
+  marginRatePerLevel: ${marginRatePerLevel:0.005,0.004,0.003,0.002,0.001}
   scaleTradeRatePerLevel: ${scaleTradeRatePerLevel:0.002,0.003,0.004,0.005,0.006}
