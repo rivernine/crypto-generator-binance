@@ -1,9 +1,9 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.analysis.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
-import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
@@ -20,13 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 public class AnalysisImpl {
 
   @Value("${binance.longBlueCandleRate}")
-  private Double longBlueCandleRate;
+  private BigDecimal longBlueCandleRate;
   @Value("${binance.lossCutRate}")
-  private Double lossCutRate;
+  private BigDecimal lossCutRate;
   @Value("${binance.marginRatePerLevel}")	
-  private List<Double> marginRatePerLevel;
+  private List<BigDecimal> marginRatePerLevel;
   @Value("${binance.scaleTradeRatePerLevel}")	
-  private List<Double> scaleTradeRatePerLevel;
+  private List<BigDecimal> scaleTradeRatePerLevel;
 
   private final Status status;
 
@@ -41,8 +41,8 @@ public class AnalysisImpl {
         return false;
       }
       int longBlueCandleCount = 0;
-      Double minPrice = 100000000.00000000;
-      Double maxPrice = 0.0;
+      BigDecimal minPrice = new BigDecimal(100000000.00000000);
+      BigDecimal maxPrice = new BigDecimal(0.0);
 
       for(Candle candle: candles) {
         log.info(candle.toString());
@@ -50,13 +50,14 @@ public class AnalysisImpl {
           log.info("getFlag == 1. Return false");
           return false;
         }
-        maxPrice = Double.max(maxPrice, candle.getOpen());
-        minPrice = Double.min(minPrice, candle.getClose());
-        Double thresholdPrice = candle.getOpen() * (1 - longBlueCandleRate);
-        Double thresholdPrice2 = maxPrice * (1 - (longBlueCandleRate * 2));
+        maxPrice = maxPrice.max(candle.getOpen());
+        minPrice = minPrice.min(candle.getClose());
+        
+        BigDecimal thresholdPrice = candle.getOpen().multiply(new BigDecimal(1).subtract(longBlueCandleRate));
+        BigDecimal thresholdPrice2 = maxPrice.multiply(new BigDecimal(1).subtract(longBlueCandleRate.multiply(new BigDecimal(2))));
 
-        log.info("threshold(two longBlueCandle) : " + thresholdPrice);
-        log.info("threshold(longlongBlueCandle) : " + thresholdPrice2);
+        log.info("threshold(two longBlueCandle) : " + thresholdPrice.toString());
+        log.info("threshold(longlongBlueCandle) : " + thresholdPrice2.toString());
         if(candle.getClose().compareTo(thresholdPrice) != 1)
           longBlueCandleCount += 1;
         if(minPrice.compareTo(thresholdPrice2) != 1)
@@ -69,11 +70,11 @@ public class AnalysisImpl {
     return result;
   }
 
-  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, Double usedBalance) {
-    Double feeRate = 0.0002;
-    Double marginRate = marginRatePerLevel.get(level);
-    Double targetBalance = usedBalance * (1 + marginRate + feeRate);
-    Double targetPrice = targetBalance / Double.parseDouble(coinQuantity);
+  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, BigDecimal usedBalance) {
+    BigDecimal feeRate = new BigDecimal(0.0002);
+    BigDecimal marginRate = marginRatePerLevel.get(level);
+    BigDecimal targetBalance = usedBalance.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
+    BigDecimal targetPrice = targetBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.HALF_UP);
 
     targetPrice = convertTickPrice(symbol, targetPrice);
     log.info("coinQuantity : targetBalance");
@@ -82,17 +83,17 @@ public class AnalysisImpl {
     return targetPrice.toString();
   }
 
-  public Double calLossCutPrice(String coinQuantity, Double usedBalance) {
-    Double avgBuyPrice = usedBalance / Double.parseDouble(coinQuantity);
-    Double lossCutPrice = avgBuyPrice * (1 - lossCutRate);
+  public BigDecimal calLossCutPrice(String coinQuantity, BigDecimal usedBalance) {
+    BigDecimal avgBuyPrice = usedBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.HALF_UP);
+    BigDecimal lossCutPrice = avgBuyPrice.multiply(new BigDecimal(1).subtract(lossCutRate));
 
     return lossCutPrice;
   }
 
-  public Boolean judgeScaleTrade(Double curPrice, Double lastBidPrice, Integer level) {
+  public Boolean judgeScaleTrade(BigDecimal curPrice, BigDecimal lastBidPrice, Integer level) {
     Boolean result;
-    Double scaleTradeRate = scaleTradeRatePerLevel.get(level);
-    Double thresholdPrice = lastBidPrice * (1 - scaleTradeRate);
+    BigDecimal scaleTradeRate = scaleTradeRatePerLevel.get(level);
+    BigDecimal thresholdPrice = lastBidPrice.multiply(new BigDecimal(1).subtract(scaleTradeRate));
     
     if(curPrice.compareTo(thresholdPrice) == -1) {
       result = true;
@@ -105,16 +106,17 @@ public class AnalysisImpl {
     return result;
   }
 
-  public Double convertTickPrice(Symbol symbol, Double price) {
-    Double result;
-    Double tickSize = Double.parseDouble(symbol.getTickSize());
-    Double mod = price % tickSize;
+  public BigDecimal convertTickPrice(Symbol symbol, BigDecimal price) {
+    BigDecimal result;
+    BigDecimal tickSize = new BigDecimal(symbol.getTickSize());
+    BigDecimal mod = price.remainder(tickSize);
 
-    if(mod.compareTo(0.0) == 0) {
+    if(mod.compareTo(new BigDecimal(0.0)) == 0) {
       result = price;
     } else {
-      Double tmp = price / tickSize;
-      result = tmp.intValue() * tickSize + tickSize;
+      BigDecimal tmp = price.divide(tickSize, 8, RoundingMode.HALF_UP);
+      result = tmp.setScale(0, RoundingMode.DOWN).multiply(tickSize);
+      result = result.add(tickSize);
     }
     log.info("price : convertedPrice");
     log.info(price.toString() + " : " + result.toString());
@@ -122,21 +124,22 @@ public class AnalysisImpl {
     return result;
   }
 
-  public String convertStepSize(Symbol symbol, Double quantity) {
-    Double result;
-    Double stepSize = Double.parseDouble(symbol.getStepSize());
-    Double mod = quantity / stepSize;
+  public String convertStepSize(Symbol symbol, BigDecimal quantity) {
+    BigDecimal result;
+    BigDecimal stepSize = new BigDecimal(symbol.getStepSize());
+    BigDecimal mod = quantity.remainder(stepSize);
 
-    if(mod.compareTo(0.0) == 0) {
+    if(mod.compareTo(new BigDecimal(0.0)) == 0) {
       result = quantity;
     } else {
-      Double tmp = quantity / stepSize;
-      if(tmp.compareTo(5.0) == -1) {
-        result = tmp.intValue() * stepSize + stepSize;
-      } else {
-        result = tmp.intValue() * stepSize;
-      }
+      BigDecimal tmp = quantity.divide(stepSize, 8, RoundingMode.HALF_UP);
+      result = tmp.setScale(0, RoundingMode.DOWN).multiply(stepSize);
+      if(result.compareTo(new BigDecimal(5.0)) == -1)
+        result = result.add(stepSize);
     }
+
+    log.info("stepSize : quantity : convertedQuantity");
+    log.info(stepSize.toString() + " : " + quantity.toString() + " : " + result.toString());
 
     return result.toString();
   }

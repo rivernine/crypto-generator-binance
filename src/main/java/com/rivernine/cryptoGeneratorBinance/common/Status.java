@@ -1,5 +1,6 @@
 package com.rivernine.cryptoGeneratorBinance.common;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +36,12 @@ public class Status {
   public Map<String, Symbol> symbolsInfo;
 
   public Map<Integer, Order> bidInfoPerLevel;
-  public Map<Integer, Double> bidPricePerLevel;
+  public Map<Integer, BigDecimal> bidPricePerLevel;
   public String bidOrderTime;
   public Boolean waitBidOrder;
 
   public Boolean isStart;
-  public Double usedBalance;
+  public BigDecimal usedBalance;
 
   public Map<Integer, Order> askInfoPerLevel;
   public Boolean waitAskOrder;
@@ -69,7 +70,7 @@ public class Status {
     this.bidInfoPerLevel.put(this.level, order);
   }
 
-  public void addBidPricePerLevel(Double price) {
+  public void addBidPricePerLevel(BigDecimal price) {
     this.bidPricePerLevel.put(this.level, price);
   }
 
@@ -78,13 +79,13 @@ public class Status {
   }
 
   public void updateUsedBalance(Order order) {
-    Double price = order.getPrice().doubleValue();
-    Double quantity = order.getOrigQty().doubleValue();
-    this.addUsedBalance((price * quantity) * (1 + 0.0002));
+    BigDecimal price = order.getPrice();
+    BigDecimal quantity = order.getOrigQty();
+    this.addUsedBalance(price.multiply(quantity).multiply(new BigDecimal(1.0002)));
   }
 
-  public void addUsedBalance(Double balance) {
-    this.usedBalance += balance;
+  public void addUsedBalance(BigDecimal balance) {
+    this.usedBalance = this.usedBalance.add(balance);
   }
 
   public void init(){
@@ -103,7 +104,7 @@ public class Status {
     this.waitBidOrder = false;
 
     this.isStart = false;
-    this.usedBalance = 0.0;
+    this.usedBalance = new BigDecimal(0.0);
 
     this.askInfoPerLevel = new HashMap<>();
     this.waitAskOrder = false;

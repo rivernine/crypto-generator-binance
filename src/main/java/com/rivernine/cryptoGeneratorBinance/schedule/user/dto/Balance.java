@@ -1,5 +1,7 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.user.dto;
 
+import java.math.BigDecimal;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +13,11 @@ import lombok.ToString;
 public class Balance {
 
   private String asset;
-  private Double balance;
-  private Double withdrawAvailable;
+  private BigDecimal balance;
+  private BigDecimal withdrawAvailable;
 
   @Builder
-  public Balance(String asset, Double balance, Double withdrawAvailable){
+  public Balance(String asset, BigDecimal balance, BigDecimal withdrawAvailable){
     this.asset = asset;
     this.balance = balance;
     this.withdrawAvailable = withdrawAvailable;

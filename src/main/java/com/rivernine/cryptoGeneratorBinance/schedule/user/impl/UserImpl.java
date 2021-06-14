@@ -1,5 +1,6 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.user.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,8 @@ public class UserImpl {
       if(balance.getAsset().equals("USDT")) {
         result = Balance.builder() 
                         .asset(balance.getAsset())
-                        .balance(balance.getBalance().doubleValue())
-                        .withdrawAvailable(balance.getWithdrawAvailable().doubleValue())
+                        .balance(balance.getBalance())
+                        .withdrawAvailable(balance.getWithdrawAvailable())
                         .build();
       }
     }
@@ -36,9 +37,9 @@ public class UserImpl {
   }
 
   public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {
-    Double coinQuantity = 0.0;
+    BigDecimal coinQuantity = new BigDecimal(0.0);
     for(int i = 1; i <= level; i++) {
-      coinQuantity += bidOrders.get(i).getOrigQty().doubleValue();
+      coinQuantity = coinQuantity.add(bidOrders.get(i).getOrigQty());
     }
 
     return coinQuantity.toString();

@@ -1,5 +1,6 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.market.impl;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,8 +37,8 @@ public class MarketImpl {
       Candlestick candle = candles.get(i);
       LocalDateTime ldt = Instant.ofEpochMilli(candle.getOpenTime())
                             .atZone(ZoneId.systemDefault()).toLocalDateTime();
-      Double open = candle.getOpen().doubleValue();
-      Double close = candle.getClose().doubleValue();
+      BigDecimal open = candle.getOpen();
+      BigDecimal close = candle.getClose();
       int flag;
       if(open.compareTo(close) == 1) 
         flag = -1;
@@ -50,8 +51,8 @@ public class MarketImpl {
                         .symbol(symbol)
                         .time(ldt.toString())
                         .open(open)
-                        .high(candle.getHigh().doubleValue())
-                        .low(candle.getLow().doubleValue())
+                        .high(candle.getHigh())
+                        .low(candle.getLow())
                         .close(close)
                         .flag(flag)
                         .build();
@@ -80,7 +81,7 @@ public class MarketImpl {
     } else {
       log.info("Not enough size. Candles size: " + Integer.toString(candles.size()));
     }
-    
+
     return result;
   }
 
