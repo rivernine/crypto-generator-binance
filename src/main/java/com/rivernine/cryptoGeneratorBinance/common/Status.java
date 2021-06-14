@@ -28,7 +28,7 @@ public class Status {
   public List<String> symbols;
 
   public Integer level = 1;
-  public Integer step;
+  public Integer step = 0;
   public Symbol symbol;
 
   public Map<String, Map<LocalDateTime, Candle>> candles;

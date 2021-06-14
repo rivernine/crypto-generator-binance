@@ -30,10 +30,6 @@ public class AnalysisJob {
     return analysisImpl.calLossCutPrice(coinQuantity, usedBalance);
   }
 
-  public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {
-    return analysisImpl.getCoinQuantity(bidOrders, level);
-  }
-
   public Boolean judgeScaleTrade(Double curPrice, Double lastBidPrice, Integer level) {
     return analysisImpl.judgeScaleTrade(curPrice, lastBidPrice, level);
   }

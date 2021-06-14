@@ -89,15 +89,6 @@ public class AnalysisImpl {
     return lossCutPrice;
   }
 
-  public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {
-    Double coinQuantity = 0.0;
-    for(int i = 1; i <= level; i++) {
-      coinQuantity += bidOrders.get(i).getOrigQty().doubleValue();
-    }
-
-    return coinQuantity.toString();
-  }
-
   public Boolean judgeScaleTrade(Double curPrice, Double lastBidPrice, Integer level) {
     Boolean result;
     Double scaleTradeRate = scaleTradeRatePerLevel.get(level);
@@ -140,7 +131,11 @@ public class AnalysisImpl {
       result = quantity;
     } else {
       Double tmp = quantity / stepSize;
-      result = tmp.intValue() * stepSize;
+      if(tmp.compareTo(5.0) == -1) {
+        result = tmp.intValue() * stepSize + stepSize;
+      } else {
+        result = tmp.intValue() * stepSize;
+      }
     }
 
     return result.toString();
