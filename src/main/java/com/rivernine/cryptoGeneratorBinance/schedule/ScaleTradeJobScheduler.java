@@ -5,7 +5,6 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.client.model.enums.OrderState;
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.Leverage;
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
 import com.rivernine.cryptoGeneratorBinance.common.Client;
@@ -101,7 +100,7 @@ public class ScaleTradeJobScheduler {
 
         if(myBalance.compareTo(bidBalance) != -1) {
           BigDecimal closePrice = candle.getClose();
-          String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(closePrice, 8, RoundingMode.HALF_UP));
+          String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(closePrice, 8, RoundingMode.UP));
           Leverage res = tradeJob.changeInitialLeverage(symbolName, leverage);
           log.info(res.toString());
           bidOrder = tradeJob.bid(symbolName, quantity, closePrice.toString());
@@ -148,7 +147,7 @@ public class ScaleTradeJobScheduler {
           Order newBidOrder = tradeJob.getOrder(symbolName, oldBidOrder.getOrderId());
 
           log.info(newBidOrder.toString());
-          if(newBidOrder.getStatus().equals(OrderState.FILLED)) {
+          if(newBidOrder.getStatus().equals("FILLED")) {
             log.info("Success bidding!!");              
             status.setIsStart(true);
             status.addBidInfoPerLevel(newBidOrder);
@@ -186,7 +185,7 @@ public class ScaleTradeJobScheduler {
             log.info("[30 -> 42] [cancel ask order step] ");
             status.setStep(42);
           } else {
-            if(newAskOrder.getStatus().equals(OrderState.FILLED)) {
+            if(newAskOrder.getStatus().equals("FILLED")) {
               log.info("Success asking!!");
               log.info("[30 -> 0] [init step] ");
               status.setStep(0);
@@ -203,7 +202,7 @@ public class ScaleTradeJobScheduler {
         Order cancelBidOrder = tradeJob.cancelOrder(symbolName, bidOrders.get(level).getOrderId());
 
         log.info(cancelBidOrder.toString());
-        if(cancelBidOrder.getStatus().equals(OrderState.CANCELED)) {
+        if(cancelBidOrder.getStatus().equals("CANCELED")) {
           log.info("Success cancel bid order!!");
           status.setWaitBidOrder(false);
           if(!status.getIsStart()) {
@@ -225,7 +224,7 @@ public class ScaleTradeJobScheduler {
         Order cancelAskOrder = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
 
         log.info(cancelAskOrder.toString());
-        if(cancelAskOrder.getStatus().equals(OrderState.CANCELED)) {
+        if(cancelAskOrder.getStatus().equals("CANCELED")) {
           log.info("Success cancel ask order for bid!!");
           log.info("[41 -> 20] [ask step]");
           status.setWaitAskOrder(false);
@@ -240,7 +239,7 @@ public class ScaleTradeJobScheduler {
         Order cancelAskOrderForScaleTrade = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
 
         log.info(cancelAskOrderForScaleTrade.toString());
-        if(cancelAskOrderForScaleTrade.getStatus().equals(OrderState.CANCELED)) {
+        if(cancelAskOrderForScaleTrade.getStatus().equals("CANCELED")) {
           log.info("Success cancel ask order for scale trade!!. Increase Level!!");
           log.info("[42 -> 10] [bid step]");
           status.increaseLevel();
@@ -255,12 +254,12 @@ public class ScaleTradeJobScheduler {
         symbolName = symbol.getSymbolName();
         Order cancelOrderForLossCut = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
 
-        if(cancelOrderForLossCut.getStatus().equals(OrderState.CANCELED)) {
+        if(cancelOrderForLossCut.getStatus().equals("CANCELED")) {
           log.info("Success cancel order!!");
           status.setWaitAskOrder(false);
           String quantity = userJob.getCoinQuantity(bidOrders, level);
           Order newOrder = tradeJob.askMarket(symbolName, quantity);
-          if(newOrder.getStatus().equals(OrderState.FILLED)) {
+          if(newOrder.getStatus().equals("FILLED")) {
             log.info("Success loss cut..");
             log.info("[999 -> 0] [init step] ");
             status.setStep(0);

@@ -3,7 +3,7 @@ binance:
   secretKey: ${secretKey:NONE}
   symbols: ${symbols:BTCUSDT,ETHUSDT,XRPUSDT,ADAUSDT,DOGEUSDT,ETCUSDT}
   leverages: ${leverages:1,2,3,4,5}
-  bidBalance: ${bidBalance:5}
+  bidBalance: ${bidBalance:6}
   longBlueCandleRate: ${longBlueCandleRate:0.002}
   lossCutRate: ${lossCutRate:0.02}
   marginRatePerLevel: ${marginRatePerLevel:0.5,0.4,0.3,0.2,0.1}

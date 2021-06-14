@@ -74,7 +74,7 @@ public class AnalysisImpl {
     BigDecimal feeRate = new BigDecimal(0.0002);
     BigDecimal marginRate = marginRatePerLevel.get(level);
     BigDecimal targetBalance = usedBalance.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
-    BigDecimal targetPrice = targetBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.HALF_UP);
+    BigDecimal targetPrice = targetBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.UP);
 
     targetPrice = convertTickPrice(symbol, targetPrice);
     log.info("coinQuantity : targetBalance");
