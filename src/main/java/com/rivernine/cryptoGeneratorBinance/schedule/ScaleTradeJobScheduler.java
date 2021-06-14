@@ -69,25 +69,25 @@ public class ScaleTradeJobScheduler {
         break;
       case 1:
         // [ select market step ]
-        // for(String symb: status.getSymbols()) {
-        //   log.info("< " + symb + " >");
-        //   candles = marketJob.getRecentCandles(symb, 3);
-        //   if(analysisJob.analysisCandles(candles, 3)) {
-        //     log.info("It's time to bid!! My select : " + symb);
-        //     log.info("[1 -> 10] [bid step] ");
-        //     Symbol select = status.getSymbolsInfo().get(symb);
-        //     status.setSymbol(select);
-        //     status.setStep(10);
-        //     break;
-        //   }
-        // }
+        for(String symb: status.getSymbols()) {
+          log.info("< " + symb + " >");
+          candles = marketJob.getRecentCandles(symb, 3);
+          if(analysisJob.analysisCandles(candles, 3)) {
+            log.info("It's time to bid!! My select : " + symb);
+            log.info("[1 -> 10] [bid step] ");
+            Symbol select = status.getSymbolsInfo().get(symb);
+            status.setSymbol(select);
+            status.setStep(10);
+            break;
+          }
+        }
 
         // [ select market test step]
-        log.info("< BTCUSDT >");
-        log.info("It's time to bid!! My select : BTCUSDT");
-        log.info("[1 -> 10] [bid step] ");
-        status.setSymbol(status.getSymbolsInfo().get("XRPUSDT"));
-        status.setStep(10);
+        // log.info("< BTCUSDT >");
+        // log.info("It's time to bid!! My select : BTCUSDT");
+        // log.info("[1 -> 10] [bid step] ");
+        // status.setSymbol(status.getSymbolsInfo().get("XRPUSDT"));
+        // status.setStep(10);
         break;
       case 10:
         // [bid step]
