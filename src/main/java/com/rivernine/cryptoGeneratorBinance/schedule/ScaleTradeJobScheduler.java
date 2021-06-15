@@ -69,6 +69,7 @@ public class ScaleTradeJobScheduler {
         break;
       case 1:
         // [ select market step ]
+        log.info("---------------------");
         for(String symb: status.getSymbols()) {
           log.info("< " + symb + " >");
           candles = marketJob.getRecentCandles(symb, 3);
