@@ -177,6 +177,7 @@ public class ScaleTradeJobScheduler {
           BigDecimal lossCutPrice = analysisJob.calLossCutPrice(coinQuantity, usedBalance);
           BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
 
+          log.info(candle.toString());
           log.info(newAskOrder.toString());
           if( level == 5 && 
               !lastbidOrderTime.equals(candle.getTime()) &&
