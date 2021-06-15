@@ -4,7 +4,7 @@ binance:
   symbols: ${symbols:BTCUSDT,ETHUSDT,XRPUSDT,ADAUSDT,DOGEUSDT,ETCUSDT}
   leverages: ${leverages:1,2,3,4,5}
   bidBalance: ${bidBalance:6}
-  longBlueCandleRate: ${longBlueCandleRate:0.002}
+  longBlueCandleRate: ${longBlueCandleRate:0.004}
   lossCutRate: ${lossCutRate:0.02}
-  marginRatePerLevel: ${marginRatePerLevel:0.005,0.004,0.003,0.002,0.001}
+  marginRatePerLevel: ${marginRatePerLevel:0.002,0.025,0.003,0.002,0.001}
   scaleTradeRatePerLevel: ${scaleTradeRatePerLevel:0.002,0.003,0.004,0.005,0.006}

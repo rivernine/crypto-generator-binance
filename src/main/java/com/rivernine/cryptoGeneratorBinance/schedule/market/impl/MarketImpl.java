@@ -12,6 +12,7 @@ import java.util.Map;
 import com.rivernine.cryptoGeneratorBinance.client.model.enums.CandlestickInterval;
 import com.rivernine.cryptoGeneratorBinance.client.model.market.Candlestick;
 import com.rivernine.cryptoGeneratorBinance.client.model.market.ExchangeInfoEntry;
+import com.rivernine.cryptoGeneratorBinance.client.model.market.SymbolPrice;
 import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
@@ -62,6 +63,10 @@ public class MarketImpl {
     return result;
   }
 
+  public BigDecimal getMarketPrice(String symbol) {
+    return client.getQueryClient().getSymbolPriceTicker(symbol).get(0).getPrice();
+  }
+  
   public List<Candle> getRecentCandles(String symbol, Integer count) {
     List<Candle> result = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;

@@ -28,8 +28,6 @@ public class AnalysisImpl {
   @Value("${binance.scaleTradeRatePerLevel}")	
   private List<BigDecimal> scaleTradeRatePerLevel;
 
-  private final Status status;
-
   public Boolean analysisCandles(List<Candle> candles, Integer count) {
     Boolean result = false;
     if(candles.size() < count) {
@@ -37,32 +35,22 @@ public class AnalysisImpl {
       result = false;
     } else {
       if(candles.get(0).getFlag() != -1) {
-        log.info("Last flag is not -1. return false");
+        log.info("Last flag is not -1. Return false");
         return false;
       }
-      int longBlueCandleCount = 0;
-      BigDecimal minPrice = new BigDecimal(100000000.00000000);
-      BigDecimal maxPrice = new BigDecimal(0.0);
+      BigDecimal totalChange = new BigDecimal(0.0);
 
+      // candle은 최신순
       for(Candle candle: candles) {
         log.info(candle.toString());
         if(candle.getFlag() == 1) {
           log.info("getFlag == 1. Return false");
           return false;
         }
-        maxPrice = maxPrice.max(candle.getOpen());
-        minPrice = minPrice.min(candle.getClose());
-        
-        BigDecimal thresholdPrice = candle.getOpen().multiply(new BigDecimal(1).subtract(longBlueCandleRate));
-        BigDecimal thresholdPrice2 = maxPrice.multiply(new BigDecimal(1).subtract(longBlueCandleRate.multiply(new BigDecimal(2))));
+        totalChange = totalChange.add(candle.getOpen().divide(candle.getClose(), 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
+        log.info("totalChange : " + totalChange.toString());
 
-        log.info("threshold(two longBlueCandle) : " + thresholdPrice.toString());
-        log.info("threshold(longlongBlueCandle) : " + thresholdPrice2.toString());
-        if(candle.getClose().compareTo(thresholdPrice) != 1)
-          longBlueCandleCount += 1;
-        if(minPrice.compareTo(thresholdPrice2) != 1)
-          return true;
-        if(longBlueCandleCount >= 2)
+        if(totalChange.compareTo(longBlueCandleRate) != -1)
           return true;
       }
     }

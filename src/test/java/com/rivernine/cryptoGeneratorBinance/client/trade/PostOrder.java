@@ -26,9 +26,13 @@ public class PostOrder {
 			// 				TimeInForce.GTC, "0.003", "2498", null, 
 			// 				null, null, null, NewOrderRespType.RESULT));
 
-			System.out.println(syncRequestClient.postOrder("ETHUSDT", OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
-							TimeInForce.GTC, "0.003", "2480", "true", 
-							null,	null, null, NewOrderRespType.RESULT));
+			// System.out.println(syncRequestClient.postOrder("ETHUSDT", OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
+			// 				TimeInForce.GTC, "0.003", "2480", "true", 
+			// 				null,	null, null, NewOrderRespType.RESULT));
+
+			BigDecimal a = new BigDecimal(35823.60);
+			BigDecimal b = new BigDecimal(35697.20);
+			System.out.println(a.divide(b, 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
 
 	// postOrder(symbol, side, positionSide, orderType,
 	//          timeInForce, quantity, price, reduceOnly,

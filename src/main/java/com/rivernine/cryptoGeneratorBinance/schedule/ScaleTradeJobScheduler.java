@@ -100,14 +100,17 @@ public class ScaleTradeJobScheduler {
 
         if(myBalance.compareTo(bidBalance) != -1) {
           BigDecimal closePrice = candle.getClose();
-          String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(closePrice, 8, RoundingMode.UP));
+          BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
+          BigDecimal price = closePrice.min(marketPrice);
+          String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(price, 8, RoundingMode.UP));
           Leverage res = tradeJob.changeInitialLeverage(symbolName, leverage);
+
           log.info(res.toString());
-          bidOrder = tradeJob.bid(symbolName, quantity, closePrice.toString());
+          bidOrder = tradeJob.bid(symbolName, quantity, price.toString());
           log.info(bidOrder.toString());
           log.info("[10 -> 30] [wait step]");
           status.addBidInfoPerLevel(bidOrder);
-          status.addBidPricePerLevel(closePrice);
+          status.addBidPricePerLevel(price);
           status.setBidOrderTime(candle.getTime());
           status.setWaitBidOrder(true);
           status.setStep(30);
@@ -171,11 +174,12 @@ public class ScaleTradeJobScheduler {
           coinQuantity = userJob.getCoinQuantity(bidOrders, level);
           usedBalance = status.getUsedBalance();
           BigDecimal lossCutPrice = analysisJob.calLossCutPrice(coinQuantity, usedBalance);
+          BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
 
           log.info(newAskOrder.toString());
           if( level == 5 && 
               !lastbidOrderTime.equals(candle.getTime()) &&
-              candle.getClose().compareTo(lossCutPrice) == -1) {
+              marketPrice.compareTo(lossCutPrice) == -1) {
             log.info("Loss cut.");
             log.info("[30 -> 999] [loss cut step] ");
             status.setStep(999);
@@ -253,24 +257,19 @@ public class ScaleTradeJobScheduler {
         // [ loss cut step ]
         symbolName = symbol.getSymbolName();
         Order cancelOrderForLossCut = tradeJob.cancelOrder(symbolName, askOrders.get(level).getOrderId());
-
         if(cancelOrderForLossCut.getStatus().equals("CANCELED")) {
           log.info("Success cancel order!!");
-          status.setWaitAskOrder(false);
-          String quantity = userJob.getCoinQuantity(bidOrders, level);
-          Order newOrder = tradeJob.askMarket(symbolName, quantity);
-          if(newOrder.getStatus().equals("FILLED")) {
-            log.info("Success loss cut..");
-            log.info("[999 -> 0] [init step] ");
-            status.setStep(0);
-          } else {
-            log.info("Error during asking");
-
-          }
-        } else {
-          log.info("Already success ask order!!");
+        }
+        status.setWaitAskOrder(false);
+        String quantity = userJob.getCoinQuantity(bidOrders, level);
+        Order newOrder = tradeJob.askMarket(symbolName, quantity);
+        if(newOrder.getStatus().equals("FILLED")) {
+          log.info("Success loss cut..");
           log.info("[999 -> 0] [init step] ");
           status.setStep(0);
+        } else {
+          log.info("Error during asking");
+
         }
         break; 
     }
