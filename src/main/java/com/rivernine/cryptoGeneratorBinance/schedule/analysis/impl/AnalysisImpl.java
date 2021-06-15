@@ -60,7 +60,7 @@ public class AnalysisImpl {
 
   public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, BigDecimal usedBalance) {
     BigDecimal feeRate = new BigDecimal(0.0002);
-    BigDecimal marginRate = marginRatePerLevel.get(level);
+    BigDecimal marginRate = marginRatePerLevel.get(level - 1);
     BigDecimal targetBalance = usedBalance.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
     BigDecimal targetPrice = targetBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.UP);
 
@@ -80,7 +80,7 @@ public class AnalysisImpl {
 
   public Boolean judgeScaleTrade(BigDecimal curPrice, BigDecimal lastBidPrice, Integer level) {
     Boolean result;
-    BigDecimal scaleTradeRate = scaleTradeRatePerLevel.get(level);
+    BigDecimal scaleTradeRate = scaleTradeRatePerLevel.get(level - 1);
     BigDecimal thresholdPrice = lastBidPrice.multiply(new BigDecimal(1).subtract(scaleTradeRate));
     
     if(curPrice.compareTo(thresholdPrice) == -1) {

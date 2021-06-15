@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class UserImpl {
 
-  private final Status status;
   private final Client client;
 
   public Balance getUSDTBalance() {

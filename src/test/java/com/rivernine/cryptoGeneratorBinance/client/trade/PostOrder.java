@@ -30,10 +30,14 @@ public class PostOrder {
 			// 				TimeInForce.GTC, "0.003", "2480", "true", 
 			// 				null,	null, null, NewOrderRespType.RESULT));
 
-			BigDecimal a = new BigDecimal(35823.60);
-			BigDecimal b = new BigDecimal(35697.20);
-			System.out.println(a.divide(b, 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
+			BigDecimal a = new BigDecimal(4);
+			BigDecimal b = new BigDecimal(1.5958);
+			BigDecimal usedBalance = a.multiply(b).multiply(new BigDecimal(1.0002));
+			BigDecimal feeRate = new BigDecimal(0.0002);
+			BigDecimal marginRate = new BigDecimal(0.0025);
 
+			BigDecimal targetBalance = usedBalance.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
+			System.out.println(targetBalance.toString());
 	// postOrder(symbol, side, positionSide, orderType,
 	//          timeInForce, quantity, price, reduceOnly,
 	//          newClientOrderId, stopPrice, workingType, newOrderRespType)                                  ;
