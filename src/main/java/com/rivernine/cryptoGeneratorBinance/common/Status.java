@@ -17,7 +17,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ToString
 @Component
 @NoArgsConstructor
@@ -78,11 +80,15 @@ public class Status {
     this.askInfoPerLevel.put(this.level, order);
   }
 
-  public void updateUsedBalance(Order order, Integer level) {
+  public void updateUsedBalance(Order order) {
     BigDecimal price = order.getPrice();
     BigDecimal quantity = order.getOrigQty();
-    BigDecimal usedBalance = price.multiply(quantity).multiply(new BigDecimal(1.0002));
-    this.addUsedBalance(usedBalance.multiply(new BigDecimal(level)));
+    BigDecimal usedBalance = price.multiply(quantity).multiply(new BigDecimal(1.0002));    
+    // log.info("price : quantity : usedBalance");
+    // log.info(price.toString() + " : " + quantity.toString() + " : " + usedBalance);
+    this.addUsedBalance(usedBalance);
+    // log.info("after updateUsedBalance");
+    // log.info(this.usedBalance.toString());
   }
 
   public void addUsedBalance(BigDecimal balance) {

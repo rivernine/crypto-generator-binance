@@ -125,7 +125,7 @@ public class ScaleTradeJobScheduler {
         symbolName = symbol.getSymbolName();
         coinQuantity = userJob.getCoinQuantity(bidOrders, level);
         usedBalance = status.getUsedBalance();
-        String askPrice = analysisJob.calAskPrice(level, symbol, coinQuantity, usedBalance);
+        String askPrice = analysisJob.calAskPrice(level, symbol, coinQuantity, bidOrders);
 
         askOrder = tradeJob.ask(symbolName, coinQuantity, askPrice);
         log.info(askOrder.toString());
@@ -155,7 +155,7 @@ public class ScaleTradeJobScheduler {
             log.info("Success bidding!!");              
             status.setIsStart(true);
             status.addBidInfoPerLevel(newBidOrder);
-            status.updateUsedBalance(newBidOrder, level);
+            status.updateUsedBalance(newBidOrder);
             status.setWaitBidOrder(false);
             if(status.getWaitAskOrder()) {
               log.info("[30 -> 41] [cancel ask order for bid step] ");

@@ -3,8 +3,9 @@ package com.rivernine.cryptoGeneratorBinance.schedule.analysis.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.common.Status;
+import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
 
@@ -54,15 +55,26 @@ public class AnalysisImpl {
     return result;
   }
 
-  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, BigDecimal usedBalance) {
+  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, Map<Integer, Order> bidOrders) {
     BigDecimal feeRate = new BigDecimal(0.0002);
     BigDecimal marginRate = marginRatePerLevel.get(level - 1);
-    BigDecimal targetBalance = usedBalance.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
-    BigDecimal targetPrice = targetBalance.divide(new BigDecimal(coinQuantity), 8, RoundingMode.UP);
+
+    BigDecimal balanceLev = new BigDecimal(0);
+    BigDecimal quantityLev = new BigDecimal(0);
+    for( int i = 1; i <= level; i++ ){
+      Order bidOrder = bidOrders.get(i);
+      log.info(bidOrder.toString());
+      BigDecimal quantity = bidOrder.getOrigQty();
+      BigDecimal price = bidOrder.getPrice();
+      balanceLev = balanceLev.add(quantity.multiply(price).multiply(new BigDecimal(i)));
+      quantityLev = quantityLev.add(quantity.multiply(new BigDecimal(i)));
+    }
+    BigDecimal avgBuyPrice = balanceLev.divide(quantityLev, 8, RoundingMode.HALF_UP);
+    BigDecimal targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
 
     targetPrice = convertTickPrice(symbol, targetPrice);
-    log.info("coinQuantity : targetBalance");
-    log.info(coinQuantity + " : " + targetBalance.toString());
+    log.info("balanceLev : quantityLev");
+    log.info(balanceLev.toString() + " : " + quantityLev.toString());
 
     return targetPrice.toString();
   }
