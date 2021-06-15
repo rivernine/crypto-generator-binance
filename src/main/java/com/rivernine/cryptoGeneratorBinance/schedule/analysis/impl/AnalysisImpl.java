@@ -43,10 +43,6 @@ public class AnalysisImpl {
       // candle은 최신순
       for(Candle candle: candles) {
         log.info(candle.toString());
-        if(candle.getFlag() == 1) {
-          log.info("getFlag == 1. Return false");
-          return false;
-        }
         totalChange = totalChange.add(candle.getOpen().divide(candle.getClose(), 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
         log.info("totalChange : " + totalChange.toString());
 
