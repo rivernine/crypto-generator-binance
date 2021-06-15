@@ -97,15 +97,15 @@ public class ScaleTradeJobScheduler {
         candle = marketJob.getLastCandle(symbolName);
         Integer leverage = config.getLeveragePerLevel(level);
         BigDecimal myBalance = userJob.getUSDTBalance().getBalance();
-        BigDecimal bidBalance = config.getBidBalance().multiply(new BigDecimal(leverage));
+        BigDecimal bidBalance = config.getBidBalance();
 
         if(myBalance.compareTo(bidBalance) != -1) {
           BigDecimal closePrice = candle.getClose();
           BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
           BigDecimal price = closePrice.min(marketPrice);
           String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(price, 8, RoundingMode.UP));
+          
           Leverage res = tradeJob.changeInitialLeverage(symbolName, leverage);
-
           log.info(res.toString());
           bidOrder = tradeJob.bid(symbolName, quantity, price.toString());
           log.info(bidOrder.toString());
@@ -155,7 +155,7 @@ public class ScaleTradeJobScheduler {
             log.info("Success bidding!!");              
             status.setIsStart(true);
             status.addBidInfoPerLevel(newBidOrder);
-            status.updateUsedBalance(newBidOrder);
+            status.updateUsedBalance(newBidOrder, level);
             status.setWaitBidOrder(false);
             if(status.getWaitAskOrder()) {
               log.info("[30 -> 41] [cancel ask order for bid step] ");

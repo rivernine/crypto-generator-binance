@@ -78,10 +78,11 @@ public class Status {
     this.askInfoPerLevel.put(this.level, order);
   }
 
-  public void updateUsedBalance(Order order) {
+  public void updateUsedBalance(Order order, Integer level) {
     BigDecimal price = order.getPrice();
     BigDecimal quantity = order.getOrigQty();
-    this.addUsedBalance(price.multiply(quantity).multiply(new BigDecimal(1.0002)));
+    BigDecimal usedBalance = price.multiply(quantity).multiply(new BigDecimal(1.0002));
+    this.addUsedBalance(usedBalance.multiply(new BigDecimal(level)));
   }
 
   public void addUsedBalance(BigDecimal balance) {
