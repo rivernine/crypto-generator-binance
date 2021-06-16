@@ -64,17 +64,17 @@ public class AnalysisImpl {
     for( int i = 1; i <= level; i++ ){
       Order bidOrder = bidOrders.get(i);
       log.info(bidOrder.toString());
-      BigDecimal balance = bidOrder.getOrigQty();
+      BigDecimal quantity = bidOrder.getOrigQty();
       BigDecimal price = bidOrder.getPrice();
-      totalBalance = totalBalance.add(quantity.multiply(price).multiply(new BigDecimal(i)));
-      quantityLev = quantityLev.add(quantity.multiply(new BigDecimal(i)));
+      totalBalance = totalBalance.add(quantity.multiply(price));
+      totalQuantity = totalQuantity.add(quantity);
     }
-    BigDecimal avgBuyPrice = balanceLev.divide(quantityLev, 8, RoundingMode.HALF_UP);
+    BigDecimal avgBuyPrice = totalBalance.divide(totalQuantity, 8, RoundingMode.HALF_UP);
     BigDecimal targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
 
     targetPrice = convertTickPrice(symbol, targetPrice);
-    log.info("balanceLev : quantityLev");
-    log.info(balanceLev.toString() + " : " + quantityLev.toString());
+    log.info("totalBalance : totalQuantity");
+    log.info(totalBalance.toString() + " : " + totalQuantity.toString());
 
     return targetPrice.toString();
   }
