@@ -18,12 +18,17 @@ import lombok.ToString;
 @Setter
 public class Config {
                     
-  @Value("${binance.leverages}")
-  public List<Integer> leverages;
-  @Value("${binance.bidBalance}")
-  public BigDecimal bidBalance;
+  // @Value("${binance.leverages}")
+  // public List<Integer> leverages;
+  // @Value("${binance.bidBalance}")
+  // public BigDecimal bidBalance;
+  @Value("${binance.bidBalancePerLevel}")
+  public List<BigDecimal> bidBalancePerLevel;
 
-  public Integer getLeveragePerLevel(Integer level) {
-    return this.leverages.get(level - 1);
+  public BigDecimal getBidBalance(Integer level) {
+    return this.bidBalancePerLevel.get(level - 1);
   }
+  // public Integer getLeveragePerLevel(Integer level) {
+  //   return this.leverages.get(level - 1);
+  // }
 }

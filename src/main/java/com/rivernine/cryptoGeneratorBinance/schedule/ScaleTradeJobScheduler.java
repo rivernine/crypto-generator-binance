@@ -95,9 +95,8 @@ public class ScaleTradeJobScheduler {
         symbol = status.getSymbol();
         symbolName = symbol.getSymbolName();
         candle = marketJob.getLastCandle(symbolName);
-        Integer leverage = config.getLeveragePerLevel(level);
         BigDecimal myBalance = userJob.getUSDTBalance().getBalance();
-        BigDecimal bidBalance = config.getBidBalance();
+        BigDecimal bidBalance = config.getBidBalance(level);
 
         if(myBalance.compareTo(bidBalance) != -1) {
           BigDecimal closePrice = candle.getClose();
@@ -105,7 +104,7 @@ public class ScaleTradeJobScheduler {
           BigDecimal price = closePrice.min(marketPrice);
           String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(price, 8, RoundingMode.UP));
           
-          Leverage res = tradeJob.changeInitialLeverage(symbolName, leverage);
+          Leverage res = tradeJob.changeInitialLeverage(symbolName, 1);
           log.info(res.toString());
           bidOrder = tradeJob.bid(symbolName, quantity, price.toString());
           log.info(bidOrder.toString());

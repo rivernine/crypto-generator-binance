@@ -59,14 +59,14 @@ public class AnalysisImpl {
     BigDecimal feeRate = new BigDecimal(0.0002);
     BigDecimal marginRate = marginRatePerLevel.get(level - 1);
 
-    BigDecimal balanceLev = new BigDecimal(0);
-    BigDecimal quantityLev = new BigDecimal(0);
+    BigDecimal totalBalance = new BigDecimal(0);
+    BigDecimal totalQuantity = new BigDecimal(0);
     for( int i = 1; i <= level; i++ ){
       Order bidOrder = bidOrders.get(i);
       log.info(bidOrder.toString());
-      BigDecimal quantity = bidOrder.getOrigQty();
+      BigDecimal balance = bidOrder.getOrigQty();
       BigDecimal price = bidOrder.getPrice();
-      balanceLev = balanceLev.add(quantity.multiply(price).multiply(new BigDecimal(i)));
+      totalBalance = totalBalance.add(quantity.multiply(price).multiply(new BigDecimal(i)));
       quantityLev = quantityLev.add(quantity.multiply(new BigDecimal(i)));
     }
     BigDecimal avgBuyPrice = balanceLev.divide(quantityLev, 8, RoundingMode.HALF_UP);

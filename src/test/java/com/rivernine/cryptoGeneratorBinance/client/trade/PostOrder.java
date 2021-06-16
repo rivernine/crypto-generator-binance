@@ -30,11 +30,15 @@ public class PostOrder {
 			// 				TimeInForce.GTC, "0.003", "2480", "true", 
 			// 				null,	null, null, NewOrderRespType.RESULT));
 
-			BigDecimal totalChange = new BigDecimal(0);
-			BigDecimal open = new BigDecimal(40238);
-			BigDecimal close = new BigDecimal(40481);
-			totalChange = totalChange.add(open.divide(close, 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
-			System.out.println(totalChange.toString());
+			System.out.println(syncRequestClient.postOrder("ETHUSDT", OrderSide.SELL, PositionSide.BOTH, OrderType.MARKET, 
+							null, "0.003", null, "true", 
+							null,	null, null, NewOrderRespType.RESULT));
+
+			// BigDecimal totalChange = new BigDecimal(0);
+			// BigDecimal open = new BigDecimal(40238);
+			// BigDecimal close = new BigDecimal(40481);
+			// totalChange = totalChange.add(open.divide(close, 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
+			// System.out.println(totalChange.toString());
 	// postOrder(symbol, side, positionSide, orderType,
 	//          timeInForce, quantity, price, reduceOnly,
 	//          newClientOrderId, stopPrice, workingType, newOrderRespType)                                  ;

@@ -14,7 +14,7 @@ public class GetPositionRisk {
                 options);
         List<PositionRisk> res = syncRequestClient.getPositionRisk();
         for(PositionRisk position: res) {
-          if(position.getSymbol().equals("ADAUSDT")) {
+          if(position.getSymbol().equals("ETHUSDT")) {
             System.out.println(position.toString());
           }
         }
