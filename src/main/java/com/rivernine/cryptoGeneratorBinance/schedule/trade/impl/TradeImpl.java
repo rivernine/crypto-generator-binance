@@ -45,7 +45,7 @@ public class TradeImpl {
 
   public Order askMarket(String symbol, String quantity) {
     return client.getInvokeClient().postOrder(symbol, OrderSide.SELL, PositionSide.BOTH, OrderType.MARKET, 
-                                      TimeInForce.GTC, quantity, null, "true", 
+                                      null, quantity, null, "true", 
                                       null,	null, null, NewOrderRespType.RESULT);
   }
 
