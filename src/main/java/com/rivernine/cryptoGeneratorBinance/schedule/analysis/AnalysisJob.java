@@ -23,12 +23,12 @@ public class AnalysisJob {
     return analysisImpl.analysisCandles(candles, count);
   }
 
-  public String calAskPrice(Integer level, Symbol symbol, String coinQuantity, Map<Integer, Order> bidOrders) {
-    return analysisImpl.calAskPrice(level, symbol, coinQuantity, bidOrders);
+  public String calAskPrice(Integer level, Symbol symbol, BigDecimal avgBuyPrice) {
+    return analysisImpl.calAskPrice(level, symbol, avgBuyPrice);
   }
 
-  public BigDecimal calLossCutPrice(String coinQuantity, BigDecimal usedBalance) {
-    return analysisImpl.calLossCutPrice(coinQuantity, usedBalance);
+  public BigDecimal calLossCutPrice(BigDecimal avgBuyPrice) {
+    return analysisImpl.calLossCutPrice(avgBuyPrice);
   }
 
   public Boolean judgeScaleTrade(BigDecimal curPrice, BigDecimal lastBidPrice, Integer level) {

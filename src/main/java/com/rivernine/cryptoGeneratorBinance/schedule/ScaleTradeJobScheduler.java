@@ -56,7 +56,7 @@ public class ScaleTradeJobScheduler {
     Symbol symbol = status.getSymbol();
     String symbolName;
     String coinQuantity;
-    BigDecimal usedBalance;
+    BigDecimal avgBuyPrice;
 
     switch(status.getStep()) {
       case 0:  
@@ -122,9 +122,9 @@ public class ScaleTradeJobScheduler {
         // [ ask step ]
         symbol = status.getSymbol();
         symbolName = symbol.getSymbolName();
+        avgBuyPrice = userJob.getEntryPrice(symbolName);
         coinQuantity = userJob.getCoinQuantity(bidOrders, level);
-        usedBalance = status.getUsedBalance();
-        String askPrice = analysisJob.calAskPrice(level, symbol, coinQuantity, bidOrders);
+        String askPrice = analysisJob.calAskPrice(level, symbol, avgBuyPrice);
 
         askOrder = tradeJob.ask(symbolName, coinQuantity, askPrice);
         log.info(askOrder.toString());
@@ -171,9 +171,8 @@ public class ScaleTradeJobScheduler {
         if(status.getWaitAskOrder()) {
           Order oldAskOrder = status.getAskInfoPerLevel().get(level);
           Order newAskOrder = tradeJob.getOrder(symbolName, oldAskOrder.getOrderId());
-          coinQuantity = userJob.getCoinQuantity(bidOrders, level);
-          usedBalance = status.getUsedBalance();
-          BigDecimal lossCutPrice = analysisJob.calLossCutPrice(coinQuantity, usedBalance);
+          avgBuyPrice = userJob.getEntryPrice(symbolName);
+          BigDecimal lossCutPrice = analysisJob.calLossCutPrice(avgBuyPrice);
           BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
 
           log.info(candle.toString());

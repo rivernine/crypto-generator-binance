@@ -1,5 +1,6 @@
 package com.rivernine.cryptoGeneratorBinance.schedule.user;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
@@ -21,5 +22,9 @@ public class UserJob {
 
   public String getCoinQuantity(Map<Integer, Order> bidOrders, Integer level) {
     return userImpl.getCoinQuantity(bidOrders, level);
+  }
+
+  public BigDecimal getEntryPrice(String symbolName) {
+    return userImpl.getEntryPrice(symbolName);
   }
 }
