@@ -37,7 +37,7 @@ public class ScaleTradeJobScheduler {
   private final UserJob userJob;
   private final TradeJob tradeJob;
 
-  @Scheduled(fixedDelay = 1000)
+  // @Scheduled(fixedDelay = 1000)
   public void runCollectCandlesJob() {    
     List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
@@ -45,7 +45,7 @@ public class ScaleTradeJobScheduler {
     }
   }
 
-  @Scheduled(fixedDelay = 1000)
+  // @Scheduled(fixedDelay = 1000)
   public void runScaleTradeJob() {
     Integer level = status.getLevel();
     List<Candle> candles;
@@ -116,6 +116,9 @@ public class ScaleTradeJobScheduler {
           status.setStep(30);
         } else {
           log.info("Not enough money.");
+          log.info("Loss cut.");
+          log.info("[10 -> 999] [loss cut step] ");
+          status.setStep(999);
         }
         break;
       case 20:

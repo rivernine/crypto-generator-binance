@@ -3,6 +3,7 @@ package com.rivernine.cryptoGeneratorBinance.schedule.market;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.rivernine.cryptoGeneratorBinance.client.model.market.OrderBook;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.impl.MarketImpl;
 
@@ -15,6 +16,12 @@ import lombok.RequiredArgsConstructor;
 public class MarketJob {
   private final MarketImpl marketImpl;
 
+  // scalping
+  public OrderBook getOrderBook(String symbol) {
+    return marketImpl.getOrderBook(symbol);
+  }
+
+  // scale trade
   public List<Candle> collectCandlesFiveMinutes(String symbol, Integer limit) {
     return marketImpl.collectCandlesFiveMinutes(symbol, limit);
   }

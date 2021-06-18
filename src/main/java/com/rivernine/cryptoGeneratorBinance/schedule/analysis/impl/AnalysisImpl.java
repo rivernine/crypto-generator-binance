@@ -2,10 +2,11 @@ package com.rivernine.cryptoGeneratorBinance.schedule.analysis.impl;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import com.rivernine.cryptoGeneratorBinance.client.model.trade.Order;
+import com.rivernine.cryptoGeneratorBinance.client.model.market.OrderBook;
+import com.rivernine.cryptoGeneratorBinance.client.model.market.OrderBookEntry;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Symbol;
 
@@ -28,6 +29,22 @@ public class AnalysisImpl {
   private List<BigDecimal> marginRatePerLevel;
   @Value("${binance.scaleTradeRatePerLevel}")	
   private List<BigDecimal> scaleTradeRatePerLevel;
+
+  // scalping
+  public List<BigDecimal> getWall(OrderBook orderBook) {
+    // [0]: askWall, [1]: bidWall
+    List<BigDecimal> result = new ArrayList<>();
+    
+    List<OrderBookEntry> asks = orderBook.getAsks();  // 오름차순
+    List<OrderBookEntry> bids = orderBook.getBids();  // 내림차순
+
+    for(OrderBookEntry entry: asks) {
+      BigDecimal balance = entry.getPrice().multiply(entry.getQty());
+      if(balance)
+    }
+  }
+
+  // scale trade
 
   public Boolean analysisCandles(List<Candle> candles, Integer count) {
     Boolean result = false;

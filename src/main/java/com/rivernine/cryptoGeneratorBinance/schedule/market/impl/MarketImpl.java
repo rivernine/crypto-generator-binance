@@ -12,7 +12,7 @@ import java.util.Map;
 import com.rivernine.cryptoGeneratorBinance.client.model.enums.CandlestickInterval;
 import com.rivernine.cryptoGeneratorBinance.client.model.market.Candlestick;
 import com.rivernine.cryptoGeneratorBinance.client.model.market.ExchangeInfoEntry;
-import com.rivernine.cryptoGeneratorBinance.client.model.market.SymbolPrice;
+import com.rivernine.cryptoGeneratorBinance.client.model.market.OrderBook;
 import com.rivernine.cryptoGeneratorBinance.common.Client;
 import com.rivernine.cryptoGeneratorBinance.common.Status;
 import com.rivernine.cryptoGeneratorBinance.schedule.market.dto.Candle;
@@ -30,6 +30,14 @@ public class MarketImpl {
 
   private final Status status;
   private final Client client;
+
+  // Scalping
+  public OrderBook getOrderBook(String symbol) {
+    return client.getQueryClient().getOrderBook(symbol, null);
+  }
+
+
+  // Scale Trade
 
   public List<Candle> collectCandlesFiveMinutes(String symbol, Integer limit) {
     List<Candle> result = new ArrayList<>();
