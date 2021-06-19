@@ -36,6 +36,36 @@ public class MarketImpl {
     return client.getQueryClient().getOrderBook(symbol, null);
   }
 
+  public Candle getCandleOneMinute(String symbol) {
+    Candle result = new Candle();
+    List<Candlestick> candles = client.getQueryClient().getCandlestick(symbol, CandlestickInterval.ONE_MINUTE, null, null, 1);
+    for(Candlestick candlestick: candles) {
+      LocalDateTime ldt = Instant.ofEpochMilli(candlestick.getOpenTime())
+                            .atZone(ZoneId.systemDefault()).toLocalDateTime();
+      BigDecimal open = candlestick.getOpen();
+      BigDecimal close = candlestick.getClose();
+      int flag;
+      if(open.compareTo(close) == 1) 
+        flag = -1;
+      else if(open.compareTo(close) == 0) 
+        flag = 0;
+      else 
+        flag = 1;
+
+      Candle element = Candle.builder()
+                        .symbol(symbol)
+                        .time(ldt.toString())
+                        .open(open)
+                        .high(candlestick.getHigh())
+                        .low(candlestick.getLow())
+                        .close(close)
+                        .flag(flag)
+                        .build();
+      result = element;
+    }
+
+    return result;
+  }
 
   // Scale Trade
 

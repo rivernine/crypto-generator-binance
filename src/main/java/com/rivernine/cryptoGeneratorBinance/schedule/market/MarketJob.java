@@ -21,6 +21,10 @@ public class MarketJob {
     return marketImpl.getOrderBook(symbol);
   }
 
+  public Candle getCandleOneMinute(String symbol) {
+    return marketImpl.getCandleOneMinute(symbol);
+  }
+
   // scale trade
   public List<Candle> collectCandlesFiveMinutes(String symbol, Integer limit) {
     return marketImpl.collectCandlesFiveMinutes(symbol, limit);

@@ -31,18 +31,18 @@ public class AnalysisImpl {
   private List<BigDecimal> scaleTradeRatePerLevel;
 
   // scalping
-  public List<BigDecimal> getWall(OrderBook orderBook) {
-    // [0]: askWall, [1]: bidWall
-    List<BigDecimal> result = new ArrayList<>();
+  // public List<BigDecimal> getWall(OrderBook orderBook) {
+  //   // [0]: askWall, [1]: bidWall
+  //   List<BigDecimal> result = new ArrayList<>();
     
-    List<OrderBookEntry> asks = orderBook.getAsks();  // 오름차순
-    List<OrderBookEntry> bids = orderBook.getBids();  // 내림차순
+  //   List<OrderBookEntry> asks = orderBook.getAsks();  // 오름차순
+  //   List<OrderBookEntry> bids = orderBook.getBids();  // 내림차순
 
-    for(OrderBookEntry entry: asks) {
-      BigDecimal balance = entry.getPrice().multiply(entry.getQty());
-      if(balance)
-    }
-  }
+  //   for(OrderBookEntry entry: asks) {
+  //     BigDecimal balance = entry.getPrice().multiply(entry.getQty());
+  //     // if(balance)
+  //   }
+  // }
 
   // scale trade
 
