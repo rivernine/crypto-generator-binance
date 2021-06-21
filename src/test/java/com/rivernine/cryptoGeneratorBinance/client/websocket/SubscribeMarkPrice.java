@@ -12,7 +12,6 @@ public class SubscribeMarkPrice {
             System.out.println(event);
             client.unsubscribeAll();
         }), null);
-
     }
 
 }

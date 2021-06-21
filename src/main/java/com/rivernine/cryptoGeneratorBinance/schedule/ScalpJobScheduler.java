@@ -43,36 +43,20 @@ public class ScalpJobScheduler {
 
   @Scheduled(fixedDelay = 500)
   public void runInit() {  
+    if(!status.init) {
+      client.init();                
+      marketJob.setSymbolsInfo();   
+      status.setPosition(true);     // Long
+      status.setInit(true);
+    }
     if(client.getQueryClient() == null || client.getInvokeClient() == null) {
       client.init();
     }  
-    Candle candle = marketJob.getCandleOneMinute(symbol);
-    if(!status.getTime().equals(candle.getTime())) {
-      status.setTime(candle.getTime());
-      status.setMp(new HashMap<BigDecimal, Integer>());
-    }
   }
 
   @Scheduled(fixedDelay = 100)
   public void runScalping() {    
     BigDecimal price = marketJob.getMarketPrice(symbol);
-    price = price.setScale(0, RoundingMode.HALF_UP);
-    Map<BigDecimal, Integer> mp = status.getMp();
-    if(mp.containsKey(price)) {
-      mp.put(price, mp.get(price) + 1);
-    } else {
-      mp.put(price, 1);
-    }
-
-
-    // OrderBook orderBook = marketJob.getOrderBook(symbol);
-  }
-
-  @Scheduled(fixedDelay = 10000)
-  public void printMp() {
-    List<Entry<BigDecimal, Integer>> list = new ArrayList<>(status.getMp().entrySet());
-		list.sort(Entry.comparingByValue());
-    System.out.println("-------------");
-		list.forEach(System.out::println);
+    log.info(price.toString());
   }
 }

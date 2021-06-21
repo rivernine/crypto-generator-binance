@@ -29,16 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 public class Status {
 
-  // scalping
-  public Map<BigDecimal, Integer> mp = new HashMap<>();
-  public String time = "0000";
-  public Map<LocalDateTime, Candle> cnds = new HashMap<>();
-
-  public void addCnds(LocalDateTime key, Candle candleDto) {
-    if(!this.cnds.containsKey(key)) {
-      this.cnds.put(key, candleDto);
-    }
-  }
+  // scalping  
+  // true: Long, false: Short
+  public Boolean position;
+  public Boolean init = false;
+  public Map<String, Symbol> symbolsInfo = new HashMap<>();
 
   // scale trade
   @Value("${binance.symbols}")
@@ -49,7 +44,6 @@ public class Status {
   public Symbol symbol;
 
   public Map<String, Map<LocalDateTime, Candle>> candles;  
-  public Map<String, Symbol> symbolsInfo;
 
   public Map<Integer, Order> bidInfoPerLevel;
   public Map<Integer, BigDecimal> bidPricePerLevel;
