@@ -84,6 +84,18 @@ public class AnalysisImpl {
     return targetPrice.toString();
   }
 
+  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice) {
+    BigDecimal feeRate = new BigDecimal(0.0002);
+    BigDecimal marginRate = new BigDecimal(0.0001);
+    BigDecimal targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
+
+    targetPrice = convertTickPrice(symbol, targetPrice);
+    log.info("avgBuyPrice : targetPrice");
+    log.info(avgBuyPrice.toString() + " : " + targetPrice.toString());
+
+    return targetPrice.toString();
+  }
+
   public BigDecimal calLossCutPrice(BigDecimal avgBuyPrice) {
     return avgBuyPrice.multiply(new BigDecimal(1).subtract(lossCutRate));
   }

@@ -12,6 +12,16 @@ public class SubscribeMarkPrice {
             System.out.println(event);
             client.unsubscribeAll();
         }), null);
+
+        client.subscribeMarkPriceEvent("btcusdt", ((event) -> {
+            System.out.println(event);
+            client.unsubscribeAll();
+        }), null);
+
+        client.subscribeMarkPriceEvent("btcusdt", ((event) -> {
+            System.out.println(event);
+            client.unsubscribeAll();
+        }), null);
     }
 
 }

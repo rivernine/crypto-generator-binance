@@ -31,9 +31,21 @@ public class Status {
 
   // scalping  
   // true: Long, false: Short
+  public Map<String, Symbol> symbolsInfo = new HashMap<>();
   public Boolean position;
   public Boolean init = false;
-  public Map<String, Symbol> symbolsInfo = new HashMap<>();
+  public Boolean bidding = false;
+  public Order bidOrder = new Order();
+  public Boolean waiting = false;
+  public Integer waitCount = 0;
+
+  public void initScalping() {
+    this.symbolsInfo = new HashMap<>();
+    this.bidding = false;
+    this.bidOrder = new Order();
+    this.waiting = false;
+    this.waitCount = 0;
+  }
 
   // scale trade
   @Value("${binance.symbols}")

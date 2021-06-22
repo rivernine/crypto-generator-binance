@@ -27,6 +27,10 @@ public class AnalysisJob {
     return analysisImpl.calAskPrice(level, symbol, avgBuyPrice);
   }
 
+  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice) {
+    return analysisImpl.calAskPrice(symbol, avgBuyPrice);
+  }
+
   public BigDecimal calLossCutPrice(BigDecimal avgBuyPrice) {
     return analysisImpl.calLossCutPrice(avgBuyPrice);
   }
