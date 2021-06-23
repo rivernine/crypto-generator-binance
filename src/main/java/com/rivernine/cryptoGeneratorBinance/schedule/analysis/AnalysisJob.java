@@ -27,12 +27,16 @@ public class AnalysisJob {
     return analysisImpl.calAskPrice(level, symbol, avgBuyPrice);
   }
 
-  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice) {
-    return analysisImpl.calAskPrice(symbol, avgBuyPrice);
+  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice, Boolean position) {
+    return analysisImpl.calAskPriceForScalping(symbol, avgBuyPrice, position);
   }
 
   public BigDecimal calLossCutPrice(BigDecimal avgBuyPrice) {
     return analysisImpl.calLossCutPrice(avgBuyPrice);
+  }
+
+  public BigDecimal calLossCutPriceForScalping(BigDecimal avgBuyPrice, Boolean position) {
+    return analysisImpl.calLossCutPriceForScalping(avgBuyPrice, position);
   }
 
   public Boolean judgeScaleTrade(BigDecimal curPrice, BigDecimal lastBidPrice, Integer level) {

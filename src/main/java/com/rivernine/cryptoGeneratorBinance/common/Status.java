@@ -30,21 +30,23 @@ import lombok.extern.slf4j.Slf4j;
 public class Status {
 
   // scalping  
+  public Integer step = 0;
   // true: Long, false: Short
-  public Map<String, Symbol> symbolsInfo = new HashMap<>();
   public Boolean position;
+  public Map<String, Symbol> symbolsInfo = new HashMap<>();
   public Boolean init = false;
-  public Boolean bidding = false;
   public Order bidOrder = new Order();
-  public Boolean waiting = false;
+  public Order askOrder = new Order();
   public Integer waitCount = 0;
+  public BigDecimal avgBuyPrice;
 
   public void initScalping() {
+    this.step = 0;
     this.symbolsInfo = new HashMap<>();
-    this.bidding = false;
     this.bidOrder = new Order();
-    this.waiting = false;
     this.waitCount = 0;
+    this.askOrder = new Order();
+    this.avgBuyPrice = null;
   }
 
   // scale trade
@@ -52,7 +54,7 @@ public class Status {
   public List<String> symbols;
 
   public Integer level = 1;
-  public Integer step = 0;
+  // public Integer step = 0;
   public Symbol symbol;
 
   public Map<String, Map<LocalDateTime, Candle>> candles;  

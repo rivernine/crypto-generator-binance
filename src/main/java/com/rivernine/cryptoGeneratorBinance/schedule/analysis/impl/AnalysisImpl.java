@@ -84,10 +84,17 @@ public class AnalysisImpl {
     return targetPrice.toString();
   }
 
-  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice) {
+  public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice, Boolean position) {
     BigDecimal feeRate = new BigDecimal(0.0002);
     BigDecimal marginRate = new BigDecimal(0.0001);
-    BigDecimal targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
+    BigDecimal targetPrice;
+    if(position) {
+      // Long
+      targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));
+    } else {
+      // Short
+      targetPrice = avgBuyPrice.multiply(new BigDecimal(1).subtract(marginRate.add(feeRate)));
+    }
 
     targetPrice = convertTickPrice(symbol, targetPrice);
     log.info("avgBuyPrice : targetPrice");
@@ -98,6 +105,16 @@ public class AnalysisImpl {
 
   public BigDecimal calLossCutPrice(BigDecimal avgBuyPrice) {
     return avgBuyPrice.multiply(new BigDecimal(1).subtract(lossCutRate));
+  }
+
+  public BigDecimal calLossCutPriceForScalping(BigDecimal avgBuyPrice, Boolean position) {
+    if(position) {
+      // Long
+      return avgBuyPrice.multiply(new BigDecimal(1).subtract(new BigDecimal(0.0002)));
+    } else {
+      // Short
+      return avgBuyPrice.multiply(new BigDecimal(1).add(new BigDecimal(0.0002)));
+    }
   }
 
   public Boolean judgeScaleTrade(BigDecimal curPrice, BigDecimal lastBidPrice, Integer level) {
