@@ -37,15 +37,21 @@ public class TradeImpl {
                                       null, null, null, NewOrderRespType.RESULT);
   }
 
+  public Order bidMarket(String symbol, String quantity) {
+    return client.getInvokeClient().postOrder(symbol, OrderSide.BUY, PositionSide.BOTH, OrderType.MARKET,
+                                      null, quantity, null, null,
+                                      null, null, null, NewOrderRespType.RESULT);
+  }
+
   public Order ask(String symbol, String quantity, String price) {
     return client.getInvokeClient().postOrder(symbol, OrderSide.SELL, PositionSide.BOTH, OrderType.LIMIT, 
-                                      TimeInForce.GTC, quantity, price, "true", 
+                                      TimeInForce.GTC, quantity, price, null, 
                                       null,	null, null, NewOrderRespType.RESULT);
   }
 
   public Order askMarket(String symbol, String quantity) {
     return client.getInvokeClient().postOrder(symbol, OrderSide.SELL, PositionSide.BOTH, OrderType.MARKET, 
-                                      null, quantity, null, "true", 
+                                      null, quantity, null, null, 
                                       null,	null, null, NewOrderRespType.RESULT);
   }
 

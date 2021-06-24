@@ -55,19 +55,26 @@ public class ScalpJobScheduler {
       case -1:
         // init step
         status.initScalping();
+        tradeJob.changeInitialLeverage(symbol, 1);
         break;
       case 0:
         // bid step
-        BigDecimal price = marketJob.getMarketPrice(symbol);
-        Order bidOrder = tradeJob.bid(symbol, "0.001", price.toString());
+        // BigDecimal price = marketJob.getMarketPrice(symbol);
+        // Order bidOrder = tradeJob.bid(symbol, "0.001", price.toString());
+        Order bidOrder;
+        if(status.getPosition()) {
+          bidOrder = tradeJob.bidMarket(symbol, "0.003");
+        } else {
+          bidOrder = tradeJob.askMarket(symbol, "0.003");
+        }
         log.info(bidOrder.toString());
         status.setBidOrder(bidOrder);
         status.setStep(1);
         break;
       case 1:
         // wait step(bid)
-        Order order = tradeJob.getOrder(symbol, status.getBidOrder().getOrderId());
-        if(order.getStatus().equals("FILLED")) {
+        Order waitBidOrder = tradeJob.getOrder(symbol, status.getBidOrder().getOrderId());
+        if(waitBidOrder.getStatus().equals("FILLED")) {
           log.info("Success bidding!!");      
           status.setStep(2);
           return;
@@ -88,45 +95,81 @@ public class ScalpJobScheduler {
         }
         BigDecimal coinQuantity = status.getBidOrder().getOrigQty();
         String askPrice = analysisJob.calAskPriceForScalping(status.getSymbolsInfo().get(symbol), status.getAvgBuyPrice(), status.getPosition());
-        Order askOrder = tradeJob.ask(symbol, coinQuantity.toString(), askPrice);
+        Order askOrder;
+        if(status.getPosition()) {
+          askOrder = tradeJob.ask(symbol, coinQuantity.toString(), askPrice);
+        } else {
+          askOrder = tradeJob.bid(symbol, coinQuantity.toString(), askPrice);
+        }
         log.info(askOrder.toString());
+        status.setAskOrder(askOrder);
         status.setStep(3);
         break;
       case 3:
         // wait step(ask)
+        Order waitAskOrder = tradeJob.getOrder(symbol, status.getAskOrder().getOrderId());
+        if(waitAskOrder.getStatus().equals("FILLED")) {
+          log.info("Success asking!!");   
+          log.info("++++++++++Generated++++++++++");
+          status.setStep(-1);
+          return;
+        }
+
         BigDecimal curPrice = marketJob.getMarketPrice(symbol);
         BigDecimal lossCutPrice = analysisJob.calLossCutPriceForScalping(status.getAvgBuyPrice(), status.getPosition());
-        if(curPrice.compareTo(lossCutPrice) == -1) {
-          log.info("Loss cut");
+        if(status.getPosition() && curPrice.compareTo(lossCutPrice) == -1) {
+          log.info("curPrice : lossCutPrice");
+          log.info(curPrice.toString() + " : " + lossCutPrice.toString());
+          log.info("----------Loss cut----------");
+          status.setStep(11);
+        } else if(!status.getPosition() && curPrice.compareTo(lossCutPrice) == 1) {
+          log.info("curPrice : lossCutPrice");
+          log.info(curPrice.toString() + " : " + lossCutPrice.toString());
+          log.info("----------Loss cut----------");
           status.setStep(11);
         }
         break;
       case 10:
         // cancel step(bid)
-        Order cancelBidOrder = tradeJob.cancelOrder(symbol, status.getBidOrder().getOrderId());
-        log.info(cancelBidOrder.toString());
-        if(cancelBidOrder.getStatus().equals("CANCELED")) {
-          log.info("Success cancel bid order!!");
-          status.initScalping();
-        } else {
+        try{
+          Order cancelBidOrder = tradeJob.cancelOrder(symbol, status.getBidOrder().getOrderId());
+          log.info(cancelBidOrder.toString());
+          if(cancelBidOrder.getStatus().equals("CANCELED")) {
+            log.info("Success cancel bid order!!");
+            status.setStep(-1);
+          }
+        } catch( Exception e ) {
+          log.info(e.getMessage());
           log.info("Already bidding");
           status.setStep(2);
         }
         break;
       case 11:
         // losscut step
-        Order cancelAskOrder = tradeJob.cancelOrder(symbol, status.getAskOrder().getOrderId());
-        log.info(cancelAskOrder.toString());
-        if(cancelAskOrder.getStatus().equals("CANCELED")) {
-          log.info("Success cancel ask order!!");
-          BigDecimal quantity = status.getBidOrder().getOrigQty();
-          Order newOrder = tradeJob.askMarket(symbol, quantity.toString());
-          log.info(newOrder.toString());
-          status.setPosition(!status.getPosition());
-        } else {
-          log.info("Already asking");
+        try{
+          Order cancelAskOrder = tradeJob.cancelOrder(symbol, status.getAskOrder().getOrderId());
+          log.info(cancelAskOrder.toString());
+          if(cancelAskOrder.getStatus().equals("CANCELED")) {
+            log.info("Success cancel ask order!!");
+            BigDecimal quantity = status.getBidOrder().getOrigQty();
+            Order newOrder;
+            if(status.getPosition()) {
+              newOrder = tradeJob.askMarket(symbol, quantity.toString());
+              log.info("Change position. (Long -> Short)");
+            } else {
+              newOrder = tradeJob.bidMarket(symbol, quantity.toString());
+              log.info("Change position. (Short -> Long)");
+            }
+            log.info(newOrder.toString());
+            status.setPosition(!status.getPosition());
+          }
+        } catch( Exception e ) {
+          log.info("++++++++++Generated++++++++++");
+          log.info(e.getMessage());
+        } finally {
+          status.setStep(-1);
         }
-        status.setStep(-1);
+        
         break;
     }
 

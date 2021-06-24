@@ -85,8 +85,8 @@ public class AnalysisImpl {
   }
 
   public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice, Boolean position) {
-    BigDecimal feeRate = new BigDecimal(0.0002);
-    BigDecimal marginRate = new BigDecimal(0.0001);
+    BigDecimal feeRate = new BigDecimal(0.0004);
+    BigDecimal marginRate = new BigDecimal(0.0004);
     BigDecimal targetPrice;
     if(position) {
       // Long
@@ -110,10 +110,10 @@ public class AnalysisImpl {
   public BigDecimal calLossCutPriceForScalping(BigDecimal avgBuyPrice, Boolean position) {
     if(position) {
       // Long
-      return avgBuyPrice.multiply(new BigDecimal(1).subtract(new BigDecimal(0.0002)));
+      return avgBuyPrice.multiply(new BigDecimal(1).subtract(new BigDecimal(0.0005)));
     } else {
       // Short
-      return avgBuyPrice.multiply(new BigDecimal(1).add(new BigDecimal(0.0002)));
+      return avgBuyPrice.multiply(new BigDecimal(1).add(new BigDecimal(0.0005)));
     }
   }
 

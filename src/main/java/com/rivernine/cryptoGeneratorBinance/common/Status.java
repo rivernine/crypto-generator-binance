@@ -42,7 +42,6 @@ public class Status {
 
   public void initScalping() {
     this.step = 0;
-    this.symbolsInfo = new HashMap<>();
     this.bidOrder = new Order();
     this.waitCount = 0;
     this.askOrder = new Order();

@@ -25,6 +25,10 @@ public class TradeJob {
     return tradeImpl.bid(symbol, quantity, price);
   }
 
+  public Order bidMarket(String symbol, String quantity) { 
+    return tradeImpl.bidMarket(symbol, quantity);
+  }
+
   public Order ask(String symbol, String quantity, String price) {
     return tradeImpl.ask(symbol, quantity, price);
   }
