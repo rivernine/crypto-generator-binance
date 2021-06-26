@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class ScalpJobScheduler {
+public class ScalpWallJobScheduler {
 
   @Value("${binance.symbol}")
   public String symbol;
@@ -35,7 +35,7 @@ public class ScalpJobScheduler {
   private final UserJob userJob;
   private final TradeJob tradeJob;
 
-  // @Scheduled(fixedDelay = 500)
+  @Scheduled(fixedDelay = 500)
   public void runInit() {  
     if(!status.init) {
       client.init();              
@@ -49,7 +49,7 @@ public class ScalpJobScheduler {
     }  
   }
 
-  // @Scheduled(fixedDelay = 100)
+  @Scheduled(fixedDelay = 100)
   public void runScalping() {    
     switch(status.getStep()) {
       case -1:
