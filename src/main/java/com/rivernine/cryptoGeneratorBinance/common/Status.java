@@ -40,12 +40,15 @@ public class Status {
   public Integer waitCount = 0;
   public BigDecimal avgBuyPrice;
 
+  public Boolean isLossCut = false;
+
   public void initScalping() {
     this.step = 0;
     this.bidOrder = new Order();
     this.waitCount = 0;
     this.askOrder = new Order();
     this.avgBuyPrice = null;
+    this.isLossCut = false;
   }
 
   // scale trade

@@ -37,7 +37,7 @@ public class TradeFiveMinutes {
   private final UserJob userJob;
   private final TradeJob tradeJob;
 
-  // @Scheduled(fixedDelay = 1000)
+  @Scheduled(fixedDelay = 1000)
   public void runCollectCandlesJob() {    
     List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
@@ -45,17 +45,24 @@ public class TradeFiveMinutes {
     }
   }
 
-  // @Scheduled(fixedDelay = 1000)
-  public void runScaleTradeJob() {
+  @Scheduled(fixedDelay = 500)
+  public void runTradeFiveMinutes() {
     List<Candle> candles;
     Candle candle;
     Order bidOrder, askOrder;
     Symbol symbol = status.getSymbol();
-    String symbolName;
+    String symbolName = null;
 
     switch(status.getStep()) {
       case 0:  
         // [ init step ]
+        if(status.getIsLossCut()) {
+          candle = marketJob.getLastCandle(symbolName);
+          String lastbidOrderTime = status.getBidOrderTime();
+          if(!lastbidOrderTime.equals(candle.getTime())) {
+            status.setIsLossCut(false);
+          }
+        }
         log.info("[0 -> 1] [select market step] ");
         status.init();
         status.initScalping();
@@ -80,20 +87,12 @@ public class TradeFiveMinutes {
             break;
           }
         }
-
-        // [ select market test step]
-        // log.info("< BTCUSDT >");
-        // log.info("It's time to bid!! My select : BTCUSDT");
-        // log.info("[1 -> 10] [bid step] ");
-        // status.setSymbol(status.getSymbolsInfo().get("XRPUSDT"));
-        // status.setStep(10);
         break;
       case 10:
         // [bid step]
         symbol = status.getSymbol();
         symbolName = symbol.getSymbolName();
         candle = marketJob.getLastCandle(symbolName);
-        BigDecimal myBalance = userJob.getUSDTBalance().getBalance();
         BigDecimal bidBalance = config.getBidBalance();
 
         BigDecimal closePrice = candle.getClose();
@@ -196,6 +195,7 @@ public class TradeFiveMinutes {
           Order newOrder = tradeJob.askMarket(symbolName, status.getAskOrder().getOrigQty().toString());
           log.info(newOrder.toString());
           log.info("[999 -> 0] [init step] ");
+          status.setIsLossCut(true);
           status.setStep(0);
         } catch(Exception e) {
           log.info(e.getMessage());
