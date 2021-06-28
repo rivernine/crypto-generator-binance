@@ -24,6 +24,8 @@ public class Config {
   // public BigDecimal bidBalance;
   @Value("${binance.bidBalancePerLevel}")
   public List<BigDecimal> bidBalancePerLevel;
+  @Value("${binance.bidBalance}")
+  public BigDecimal bidBalance;
 
   public BigDecimal getBidBalance(Integer level) {
     return this.bidBalancePerLevel.get(level - 1);

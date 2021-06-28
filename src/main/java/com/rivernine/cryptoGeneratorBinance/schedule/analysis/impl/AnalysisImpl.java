@@ -85,8 +85,8 @@ public class AnalysisImpl {
   }
 
   public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice, Boolean position) {
-    BigDecimal feeRate = new BigDecimal(0.0004);
-    BigDecimal marginRate = new BigDecimal(0.0004);
+    BigDecimal feeRate = new BigDecimal(0.0002);
+    BigDecimal marginRate = new BigDecimal(0.004);
     BigDecimal targetPrice;
     if(position) {
       // Long
