@@ -38,7 +38,7 @@ public class MarketImpl {
 
   public Candle getCandleOneMinute(String symbol) {
     Candle result = new Candle();
-    List<Candlestick> candles = client.getQueryClient().getCandlestick(symbol, CandlestickInterval.ONE_MINUTE, null, null, 1);
+    List<Candlestick> candles = client.getQueryClient().getCandlestick(symbol, CandlestickInterval.ONE_MINUTE, null, null, 2);
     for(Candlestick candlestick: candles) {
       LocalDateTime ldt = Instant.ofEpochMilli(candlestick.getOpenTime())
                             .atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -62,6 +62,7 @@ public class MarketImpl {
                         .flag(flag)
                         .build();
       result = element;
+      break;
     }
 
     return result;
