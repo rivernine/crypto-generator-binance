@@ -41,7 +41,8 @@ public class TradeFiveMinutes {
   public void runCollectCandlesJob() {    
     List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
-      marketJob.collectCandlesFiveMinutes(symbol, 4);
+      // marketJob.collectCandlesFiveMinutes(symbol, 4);
+      marketJob.collectCandlesThreeMinutes(symbol, 4);
     }
   }
 
@@ -52,17 +53,20 @@ public class TradeFiveMinutes {
     Order bidOrder, askOrder;
     Symbol symbol = status.getSymbol();
     String symbolName = null;
-
+    String quantity;
+    BigDecimal bidBalance;
     switch(status.getStep()) {
+      case -1:
+        symbolName = symbol.getSymbolName();
+        candle = marketJob.getLastCandle(symbolName);
+        if(!status.getBidOrderTime().equals(candle.getTime())) {
+          status.setIsLossCut(false);
+          log.info("[-1 -> 0] [init step] ");
+          status.setStep(0);
+        }
+        break;
       case 0:  
         // [ init step ]
-        if(status.getIsLossCut()) {
-          candle = marketJob.getLastCandle(symbolName);
-          String lastbidOrderTime = status.getBidOrderTime();
-          if(!lastbidOrderTime.equals(candle.getTime())) {
-            status.setIsLossCut(false);
-          }
-        }
         log.info("[0 -> 1] [select market step] ");
         status.init();
         status.initScalping();
@@ -72,9 +76,9 @@ public class TradeFiveMinutes {
         break;
       case 1:
         // [ select market step ]
-        log.info("---------------------");
+        // log.info("---------------------");
         for(String symb: status.getSymbols()) {
-          log.info("< " + symb + " >");
+          // log.info("< " + symb + " >");
           candles = marketJob.getRecentCandles(symb, 3);
           if(analysisJob.analysisCandles(candles, 3)) {
             log.info("It's time to bid!! My select : " + symb);
@@ -93,19 +97,19 @@ public class TradeFiveMinutes {
         symbol = status.getSymbol();
         symbolName = symbol.getSymbolName();
         candle = marketJob.getLastCandle(symbolName);
-        BigDecimal bidBalance = config.getBidBalance();
+        bidBalance = config.getBidBalance();
 
         BigDecimal closePrice = candle.getClose();
         BigDecimal marketPrice = marketJob.getMarketPrice(symbolName);
         BigDecimal price = closePrice.min(marketPrice);
-        String quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(price, 8, RoundingMode.UP));
+        quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(price, 8, RoundingMode.UP));
         
         bidOrder = tradeJob.bid(symbolName, quantity, price.toString());
         log.info(bidOrder.toString());
-        log.info("[10 -> 30] [wait step]");
         status.setBidOrder(bidOrder);
         status.setBidOrderTime(candle.getTime());
         status.setWaitBidOrder(true);
+        log.info("[10 -> 30] [wait step]");
         status.setStep(30);
         break;
       case 20:
@@ -194,13 +198,59 @@ public class TradeFiveMinutes {
           log.info("Success loss cut..");
           Order newOrder = tradeJob.askMarket(symbolName, status.getAskOrder().getOrigQty().toString());
           log.info(newOrder.toString());
-          log.info("[999 -> 0] [init step] ");
+          log.info("[999 -> 1000] [short step] ");
           status.setIsLossCut(true);
-          status.setStep(0);
+          status.setStep(1000);
         } catch(Exception e) {
           log.info(e.getMessage());
         }
         break; 
+      case 1000:
+        // [short step]
+        // [bid step]
+        symbol = status.getSymbol();
+        symbolName = symbol.getSymbolName();
+        bidBalance = config.getBidBalance();
+        quantity = analysisJob.convertStepSize(symbol, bidBalance.divide(marketJob.getMarketPrice(symbolName), 8, RoundingMode.UP));
+        bidOrder = tradeJob.askMarket(symbolName, quantity);
+        log.info(bidOrder.toString());
+        status.setBidOrder(bidOrder);
+        log.info("[1000 -> 1001] [wait step] ");
+        status.setStep(1001);
+        break;
+      case 1001:
+        // [wait step]
+        symbol = status.getSymbol();
+        symbolName = symbol.getSymbolName();
+        Order waitBidOrder = tradeJob.getOrder(symbolName, status.getBidOrder().getOrderId());
+        if(waitBidOrder.getStatus().equals("FILLED")) {
+          log.info("Success bidding!![short]");      
+          log.info("[1001 -> 1002] [wait step] ");
+          status.setStep(1002);
+        }
+        break;
+      case 1002:
+        // [wait for red candle step]
+        symbol = status.getSymbol();
+        symbolName = symbol.getSymbolName();
+        candle = marketJob.getCandleOneMinute(symbolName);
+        if(candle.getFlag() == 1) {
+          log.info("It's time to ask");
+          log.info("[1002 -> 1003] [ask step] ");
+          status.setStep(1003);
+        }
+        break;
+      case 1003:
+        // [ask step]
+        symbol = status.getSymbol();
+        symbolName = symbol.getSymbolName();
+        quantity = status.getBidOrder().getOrigQty().toString();
+        Order newOrder = tradeJob.bidMarket(symbolName, quantity.toString());
+        log.info(newOrder.toString());
+        log.info("Success asking!! [short]");
+        log.info("[1003 -> 0] [init step] ");
+        status.setStep(0);
+        break;
     }
     
   }

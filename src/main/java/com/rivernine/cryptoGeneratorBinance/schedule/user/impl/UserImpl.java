@@ -52,7 +52,7 @@ public class UserImpl {
     
     for(PositionRisk position: positions) {
       if(position.getSymbol().equals(symbolName)) {
-        log.info(position.toString());
+        // log.info(position.toString());
         result = position.getEntryPrice();
       }
     }

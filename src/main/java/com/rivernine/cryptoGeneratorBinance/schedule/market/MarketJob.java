@@ -30,6 +30,10 @@ public class MarketJob {
     return marketImpl.collectCandlesFiveMinutes(symbol, limit);
   }
 
+  public List<Candle> collectCandlesThreeMinutes(String symbol, Integer limit) {
+    return marketImpl.collectCandlesThreeMinutes(symbol, limit);
+  }
+
   public BigDecimal getMarketPrice(String symbol) {
     return marketImpl.getMarketPrice(symbol);
   } 

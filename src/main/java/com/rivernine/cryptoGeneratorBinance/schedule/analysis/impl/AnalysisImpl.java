@@ -49,23 +49,23 @@ public class AnalysisImpl {
   public Boolean analysisCandles(List<Candle> candles, Integer count) {
     Boolean result = false;
     if(candles.size() < count) {
-      log.info("Not enough size. Candles size: " + Integer.toString(candles.size()));
+      // log.info("Not enough size. Candles size: " + Integer.toString(candles.size()));
       result = false;
     } else {
       if(candles.get(0).getFlag() != -1) {
-        log.info("Last flag is not -1. Return false");
+        // log.info("Last flag is not -1. Return false");
         return false;
       }
       BigDecimal totalChange = new BigDecimal(0.0);
 
       // candle은 최신순
       for(Candle candle: candles) {
-        log.info(candle.toString());
         totalChange = totalChange.add(candle.getOpen().divide(candle.getClose(), 8, RoundingMode.HALF_UP).subtract(new BigDecimal(1)));
-        log.info("totalChange : " + totalChange.toString());
-
-        if(totalChange.compareTo(longBlueCandleRate) != -1)
+        if(totalChange.compareTo(longBlueCandleRate) != -1){
+          log.info(candle.toString());
+          log.info("totalChange : " + totalChange.toString());
           return true;
+        }
       }
     }
 
@@ -86,8 +86,9 @@ public class AnalysisImpl {
 
   public String calAskPriceForScalping(Symbol symbol, BigDecimal avgBuyPrice, Boolean position) {
     BigDecimal feeRate = new BigDecimal(0.0002);
-    BigDecimal marginRate = new BigDecimal(0.004);
+    BigDecimal marginRate = new BigDecimal(0.003);
     BigDecimal targetPrice;
+
     if(position) {
       // Long
       targetPrice = avgBuyPrice.multiply(marginRate.add(feeRate).add(new BigDecimal(1)));

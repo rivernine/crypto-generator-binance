@@ -101,6 +101,38 @@ public class MarketImpl {
     return result;
   }
 
+  public List<Candle> collectCandlesThreeMinutes(String symbol, Integer limit) {
+    List<Candle> result = new ArrayList<>();
+    List<Candlestick> candles = client.getQueryClient().getCandlestick(symbol, CandlestickInterval.THREE_MINUTES, null, null, limit + 1);
+    for( int i = 0; i < limit; i++ ) {
+      Candlestick candle = candles.get(i);
+      LocalDateTime ldt = Instant.ofEpochMilli(candle.getOpenTime())
+                            .atZone(ZoneId.systemDefault()).toLocalDateTime();
+      BigDecimal open = candle.getOpen();
+      BigDecimal close = candle.getClose();
+      int flag;
+      if(open.compareTo(close) == 1) 
+        flag = -1;
+      else if(open.compareTo(close) == 0) 
+        flag = 0;
+      else 
+        flag = 1;
+      
+      Candle element = Candle.builder()
+                        .symbol(symbol)
+                        .time(ldt.toString())
+                        .open(open)
+                        .high(candle.getHigh())
+                        .low(candle.getLow())
+                        .close(close)
+                        .flag(flag)
+                        .build();
+      result.add(element);
+      status.addCandles(symbol, LocalDateTime.parse(ldt.toString()), element);
+    }
+    return result;
+  }
+  
   public BigDecimal getMarketPrice(String symbol) {
     return client.getQueryClient().getSymbolPriceTicker(symbol).get(0).getPrice();
   }
