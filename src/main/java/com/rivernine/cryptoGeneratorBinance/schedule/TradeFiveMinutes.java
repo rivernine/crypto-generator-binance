@@ -248,8 +248,8 @@ public class TradeFiveMinutes {
         Order newOrder = tradeJob.bidMarket(symbolName, quantity.toString());
         log.info(newOrder.toString());
         log.info("Success asking!! [short]");
-        log.info("[1003 -> 0] [init step] ");
-        status.setStep(0);
+        log.info("[1003 -> -1] [before step] ");
+        status.setStep(-1);
         break;
     }
     
