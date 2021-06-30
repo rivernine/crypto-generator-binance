@@ -41,8 +41,8 @@ public class TradeFiveMinutes {
   public void runCollectCandlesJob() {    
     List<String> symbols = status.getSymbols();
     for(String symbol: symbols) {
-      // marketJob.collectCandlesFiveMinutes(symbol, 4);
-      marketJob.collectCandlesThreeMinutes(symbol, 4);
+      marketJob.collectCandlesFiveMinutes(symbol, 4);
+      // marketJob.collectCandlesThreeMinutes(symbol, 4);
     }
   }
 
